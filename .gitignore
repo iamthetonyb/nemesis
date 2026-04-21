@@ -1,0 +1,17 @@
+# Dependencies
+**/node_modules/
+target/
+
+# Local runtime data (SQLite)
+backend/data/
+backend/dataset/
+.wrangler/
+
+# Secrets — never commit real credentials
+backend/.env
+
+# macOS
+.DS_Store
+
+# Playwright test artifacts
+test-results/

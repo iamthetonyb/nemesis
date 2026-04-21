@@ -1,0 +1,27 @@
+{
+  "name": "usa-spending-watch-backend",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "db:reset": "node scripts/reset-db.js",
+    "db:export": "node scripts/export-db.js",
+    "db:import": "node scripts/import-db.js",
+    "export": "pnpm db:export",
+    "import": "pnpm db:import"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.9.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.3.2"
+  }
+}

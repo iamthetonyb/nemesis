@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="USA Spending Watch — independent public dashboard surfacing federal, state, county, city, district, and authority spending from official sources.">
+<title>USA Spending Watch Demo</title>
+<link rel="icon" href="data:,"/>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.css" crossorigin="anonymous" integrity="sha384-uTttxo/aOKbdE5RlD/SPzSDoDmNvGlUYPjONi2MN/b7c9HPSvW07OIuyP7uL6jxK"/>
+<link rel="stylesheet" href="assets/css/styles.css?v=4"/>
+<script src="assets/js/config.js"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script defer src="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.js" crossorigin="anonymous" integrity="sha384-XUm39RJVRRZhhm3KBfi4/fn/dxDBFEa1wA/yRSYhlb83K5ggl6ApLqbfwcJFlK/W"></script>
+<script defer src="assets/js/map.js"></script>
+<script defer src="assets/js/app.js"></script>
+</head>
+<body>
+<noscript><style>body{display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#05050a;color:#d1cfc8}</style><p>USA Spending Watch requires JavaScript.</p></noscript>
+<div class="hdr">
+<div class="hdr-l"><div class="logo">USA</div><div class="hdr-t"><h1>USA Spending Watch</h1><span>County-first source review &middot; federal, state, county, city, district, authority layers</span></div></div>
+<div class="hdr-r"><div class="ll"><span class="ldot"></span> DEMO</div><div class="yr">FY 2026</div><button class="mobile-kpi-btn" onclick="dashboardActions.toggleKpis()">KPI</button></div>
+</div>
+<div class="kpi-backdrop" id="kpiBackdrop" onclick="dashboardActions.closeKpis()"></div>
+<div class="kpi" id="kpi"></div>
+<div class="ml">
+<div class="mc">
+<div id="map"></div>
+<div class="moc" id="mf"></div>
+<div class="mlb" id="legend-container">
+<button class="legend-btn" onclick="dashboardActions.toggleLegend()">Legend</button>
+<div class="legend-content" id="legend"></div>
+</div>
+</div>
+<div class="sb" id="sidebar">
+<div class="sb-handle" onclick="dashboardActions.toggleSidebar()"></div>
+<div class="sbh"><div class="sbt" id="tabs"></div></div>
+<div class="sbc" id="sbc"></div>
+</div>
+</div>
+<button class="feedback-btn" id="feedbackButton" onclick="dashboardActions.openFeedback()">Feedback</button>
+<div class="feedback-panel" id="feedbackPanel" aria-hidden="true">
+<div class="feedback-top"><strong>Send Feedback</strong><button onclick="dashboardActions.closeFeedback()" aria-label="Close feedback">Close</button></div>
+<label>Type<select id="feedbackType"><option>Bug</option><option>Data issue</option><option>Idea</option><option>General comment</option></select></label>
+<label>Note<textarea id="feedbackText" rows="5" placeholder="What should be fixed or added?"></textarea></label>
+<div id="turnstileContainer"></div>
+<button class="feedback-submit" onclick="dashboardActions.submitFeedback()">Open GitHub Issue</button>
+<p>Uses GitHub Issues so feedback stays free, public, and auditable.</p>
+</div>
+<div class="modal-overlay" id="rupModal"><div class="modal"><div class="modal-top" id="modalTop"></div><div class="modal-body" id="modalBody"></div><div class="modal-footer">Demo uses official federal source snapshots plus simplified Census boundaries. Review tiers are amount-volume cues, not allegations of waste.</div></div></div>
+</body>
+</html>
