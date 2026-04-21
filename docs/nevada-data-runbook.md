@@ -9,7 +9,7 @@ Quick reference for working with Nevada dashboard data. See `docs/data-sources/`
 | Federal awards by county | USAspending.gov API | ✅ Live |
 | Federal awards by congressional district | USAspending.gov API | ✅ Live |
 | County/district boundaries | Census TIGERweb | ✅ Live |
-| State checkbook | Nevada Open Books (OpenGov) | 🔴 Pending — configure report ID |
+| State checkbook | Nevada Open Books (checkbook.nv.gov Socrata) | ✅ Live — $30.96B, 108 agencies |
 | State budget (w/ exclusions) | Nevada OpenBudget | 🔴 Pending |
 | Las Vegas city checkbook | Las Vegas OpenGov | 🔴 Pending — configure report ID |
 | CCSD school budget | CCSD Open Book (OpenGov) | 🔴 Pending |

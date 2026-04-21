@@ -110,6 +110,12 @@ async function run() {
     `FY ${API_YEAR} includes Nevada state checkbook ($${(txData.total_amount / 1e9).toFixed(1)}B, ${agencies.length} agencies) from checkbook.nv.gov. ` +
     `Federal awards from USAspending.gov. County, city, and district sources are in progress.`;
 
+  // Register this source in sourceMeta so bootstrap reflects all data origins
+  if (!bootstrap.sourceMeta.sources) bootstrap.sourceMeta.sources = [];
+  if (!bootstrap.sourceMeta.sources.includes(BASE)) {
+    bootstrap.sourceMeta.sources.push(BASE);
+  }
+
   await saveBootstrap(bootstrap);
   console.log(`[nevada-state-checkbook] ✅ Merged ${statePackages.length} agency packages into province data`);
 }

@@ -63,9 +63,16 @@ jobs:
       - name: Install backend deps (for any shared utilities)
         run: pnpm --dir backend install --frozen-lockfile
 
-      # --- Source ingestion steps ---
-      # Each step is independent; failures are non-fatal individually.
-      # The validate step below catches any corrupt output.
+      # --- Step 1: Regenerate federal baseline from USAspending + TIGERweb ---
+      # This always runs first — creates the authoritative base bootstrap.json.
+      # Ingest steps below then augment it with additional state/local sources.
+
+      - name: Generate federal baseline (USAspending + TIGERweb)
+        run: pnpm generate:nevada
+
+      # --- Step 2: Augment with state / local sources ---
+      # Each step reads the existing bootstrap.json and merges its data in.
+      # Failures are non-fatal; the validate step below is the hard gate.
 
       - name: Ingest — Nevada state checkbook
         if: ${{ github.event.inputs.sources == '' || contains(github.event.inputs.sources, 'state') }}
@@ -101,11 +108,6 @@ jobs:
         env:
           INGEST_DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
         continue-on-error: true
-
-      # --- Regenerate the public artifact ---
-
-      - name: Regenerate bootstrap.json from all ingested sources
-        run: pnpm generate:nevada
 
       # --- Rust validation gate — this is the hard gate ---
       # If this fails, we do not commit or deploy.
@@ -147,8 +149,18 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          echo "### Nevada Data Refresh" >> $GITHUB_STEP_SUMMARY
-          echo "- Changed: ${{ steps.diff.outputs.changed }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Dry run: ${{ github.event.inputs.dry_run || 'false' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Triggered: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Bootstrap validation: passed" >> $GITHUB_STEP_SUMMARY
+          echo "### Nevada Data Refresh — $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Triggered | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dry run | ${{ github.event.inputs.dry_run || 'false' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| bootstrap.json changed | ${{ steps.diff.outputs.changed || 'unknown' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Sources filter | ${{ github.event.inputs.sources || 'all' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f frontend/data/bootstrap.json ]; then
+            PKGS=$(node -e "const d=JSON.parse(require('fs').readFileSync('frontend/data/bootstrap.json'));console.log(d.summary?.totalPackages||0)")
+            BUDGET=$(node -e "const d=JSON.parse(require('fs').readFileSync('frontend/data/bootstrap.json'));console.log(('$'+Math.round((d.summary?.totalBudget||0)/1e9*10)/10+'B'))")
+            GEN=$(node -e "const d=JSON.parse(require('fs').readFileSync('frontend/data/bootstrap.json'));console.log(d.sourceMeta?.generatedAt||'unknown')")
+            echo "**bootstrap.json stats**: ${PKGS} packages, ${BUDGET}, generated ${GEN}" >> $GITHUB_STEP_SUMMARY
+          fi

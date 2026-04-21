@@ -5,9 +5,15 @@ The dashboard updates automatically via GitHub Actions. No server required. Data
 ## Flow
 
 ```
-Official APIs → tools/ingest/*.mjs → data/raw/ → generate-nevada-demo.mjs
-→ bootstrap.json → cargo run -p spending-validate → git commit → Cloudflare Pages deploy
+generate-nevada-demo.mjs (federal baseline: USAspending + TIGERweb)
+  → tools/ingest/*.mjs (augment: state checkbook, counties, cities, districts)
+  → bootstrap.json
+  → cargo run -p spending-validate (hard gate)
+  → git commit → Cloudflare Pages deploy
 ```
+
+**Order matters:** the federal baseline runs first, then ingest scripts augment it.
+Running ingest before generate would overwrite the augmented data.
 
 ## Automated Schedule
 
@@ -16,8 +22,8 @@ Official APIs → tools/ingest/*.mjs → data/raw/ → generate-nevada-demo.mjs
 **Runtime:** GitHub Actions (Ubuntu), free for public repos  
 
 The workflow:
-1. Runs each ingestion script (failures are non-fatal individually)
-2. Regenerates `frontend/data/bootstrap.json` from all gathered data
+1. Generates `bootstrap.json` from federal sources (USAspending + TIGERweb)
+2. Runs each augmentation script (failures are non-fatal individually)
 3. Runs the Rust validator — **hard gate**: if validation fails, nothing commits
 4. Commits + pushes only if bootstrap.json changed
 5. Cloudflare Pages auto-deploys on push (enable GitHub integration in CF dashboard)
@@ -39,17 +45,22 @@ The workflow:
 ## Running Locally
 
 ```bash
-# Single source
+# Full refresh: federal baseline + state checkbook (all live sources)
+pnpm ingest:nevada
+
+# Federal baseline only (USAspending + TIGERweb)
+pnpm generate:nevada
+
+# Single augmentation source (reads existing bootstrap.json)
 node tools/ingest/nevada-state-checkbook.mjs
 
 # Dry run (validate only, do not write files)
-INGEST_DRY_RUN=true node tools/ingest/nevada-las-vegas.mjs
+INGEST_DRY_RUN=true node tools/ingest/nevada-state-checkbook.mjs
 
-# Regenerate + validate after ingestion
-pnpm generate:nevada
+# Validate after any ingestion
 pnpm validate:data
 
-# Full gate (lint + Rust + validate + backend audit)
+# Full gate (JS syntax + Rust + validate + backend audit)
 pnpm check
 ```
 

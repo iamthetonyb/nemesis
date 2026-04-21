@@ -167,9 +167,7 @@ fn validate_packages(
 
         let source_id = required_string(package, "sourceId", &prefix, errors);
         if let Some(source_id) = source_id
-            && !source_id.starts_with("https://api.usaspending.gov/")
-            && !source_id.starts_with("https://www.usaspending.gov/award/")
-            && !source_id.starts_with("https://tigerweb.geo.census.gov/")
+            && !is_approved_source_id(source_id)
         {
             errors.push(format!(
                 "{prefix}.sourceId is not an approved official source URL"
@@ -557,6 +555,25 @@ fn non_negative_number(object: &Value, key: &str, prefix: &str, errors: &mut Vec
         Some(value) if value.is_finite() && value >= 0.0 => {}
         _ => errors.push(format!("{prefix}.{key} must be a non-negative number")),
     }
+}
+
+fn is_approved_source_id(source_id: &str) -> bool {
+    let Some(host) = https_host(source_id) else {
+        return false;
+    };
+    // Federal core sources
+    host == "api.usaspending.gov"
+        || host.ends_with(".usaspending.gov")
+        || host == "www.usaspending.gov"
+        || host == "tigerweb.geo.census.gov"
+        || host.ends_with(".census.gov")
+        // Any official US government domain
+        || host.ends_with(".gov")
+        // State/local open-data portals (Socrata, OpenGov) used by NV and other states
+        || host.ends_with(".socrata.com")
+        || host.ends_with(".opengov.com")
+        // Tyler OpenFinance (used by many counties/cities)
+        || host.ends_with(".tylertech.com")
 }
 
 fn has_official_host(url: &str, domain: &str) -> bool {
