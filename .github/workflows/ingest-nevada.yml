@@ -148,15 +148,18 @@ jobs:
 
       - name: Summary
         if: always()
+        env:
+          SOURCES_INPUT: ${{ github.event.inputs.sources || 'all' }}
+          DRY_RUN_INPUT: ${{ github.event.inputs.dry_run || 'false' }}
         run: |
           echo "### Nevada Data Refresh — $(date -u +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Triggered | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dry run | ${{ github.event.inputs.dry_run || 'false' }} |" >> $GITHUB_STEP_SUMMARY
+          printf '| Dry run | %s |\n' "$DRY_RUN_INPUT" >> "$GITHUB_STEP_SUMMARY"
           echo "| bootstrap.json changed | ${{ steps.diff.outputs.changed || 'unknown' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Sources filter | ${{ github.event.inputs.sources || 'all' }} |" >> $GITHUB_STEP_SUMMARY
+          printf '| Sources filter | %s |\n' "$SOURCES_INPUT" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ -f frontend/data/bootstrap.json ]; then
             PKGS=$(node -e "const d=JSON.parse(require('fs').readFileSync('frontend/data/bootstrap.json'));console.log(d.summary?.totalPackages||0)")

@@ -586,7 +586,12 @@ fn has_official_host(url: &str, domain: &str) -> bool {
 
 fn https_host(url: &str) -> Option<String> {
     let rest = url.strip_prefix("https://")?;
-    let host_and_port = rest.split(['/', '?', '#']).next()?;
+    let authority = rest.split(['/', '?', '#']).next()?;
+    // Strip userinfo (user:password@) so "evil@legit.gov" is not approved as legit.gov
+    let host_and_port = match authority.rfind('@') {
+        Some(pos) => &authority[pos + 1..],
+        None => authority,
+    };
     let host = host_and_port.split(':').next()?.trim();
     if host.is_empty() {
         None
