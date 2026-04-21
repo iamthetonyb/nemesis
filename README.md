@@ -13,6 +13,7 @@ Live demo: [gov-budget.pages.dev](https://gov-budget.pages.dev) · Repo: [iamthe
 - Filter by funding source: Federal, State, Local / District, Others
 - Search and sort across jurisdictions and federal agencies
 - Drill into individual records with source links back to official data
+- Optional SFX/haptic feedback for key controls, generated in-browser with no audio files
 
 All displayed claims link to official source snapshots. Labels use "review", "priority", and "needs review" — not accusations of fraud or waste.
 
@@ -39,6 +40,7 @@ frontend/
   assets/js/config.js         Runtime config (static data URL + Turnstile key)
   assets/js/app.js            Dashboard logic
   assets/js/map.js            MapLibre GL JS v5 wrapper
+  assets/js/sensory.js        Optional Web Audio + Vibration API feedback
   assets/css/styles.css       All styles
   data/bootstrap.json         Pre-generated jurisdiction + GeoJSON data
   _headers                    Cloudflare Pages security headers (CSP, HSTS, etc.)
@@ -98,6 +100,16 @@ pnpm generate:nevada   # regenerate frontend/data/bootstrap.json
 pnpm validate:data     # Rust validator — verifies source URLs, GeoJSON, key integrity
 pnpm check             # full gate: JS + Rust (fmt/clippy/test) + data + backend audit
 ```
+
+## Browser QA
+
+```bash
+pnpm install --ignore-scripts
+python3 -m http.server 8091 --directory frontend
+pnpm test:e2e
+```
+
+Set `E2E_URL=https://gov-budget.pages.dev` to run the same checks against the live Cloudflare Pages build.
 
 ---
 

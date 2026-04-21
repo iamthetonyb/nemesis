@@ -7,12 +7,13 @@
 <title>USA Spending Watch Demo</title>
 <link rel="icon" href="data:,"/>
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.css" crossorigin="anonymous" integrity="sha384-uTttxo/aOKbdE5RlD/SPzSDoDmNvGlUYPjONi2MN/b7c9HPSvW07OIuyP7uL6jxK"/>
-<link rel="stylesheet" href="assets/css/styles.css?v=8"/>
-<script src="assets/js/config.js"></script>
+<link rel="stylesheet" href="assets/css/styles.css?v=9"/>
+<script src="assets/js/config.js?v=1"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script defer src="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.js" crossorigin="anonymous" integrity="sha384-XUm39RJVRRZhhm3KBfi4/fn/dxDBFEa1wA/yRSYhlb83K5ggl6ApLqbfwcJFlK/W"></script>
-<script defer src="assets/js/map.js"></script>
-<script defer src="assets/js/app.js"></script>
+<script defer src="assets/js/map.js?v=1"></script>
+<script defer src="assets/js/sensory.js?v=1"></script>
+<script defer src="assets/js/app.js?v=1"></script>
 </head>
 <body>
 <noscript><style>body{display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#05050a;color:#d1cfc8}</style><p>USA Spending Watch requires JavaScript.</p></noscript>
@@ -66,6 +67,7 @@
 </div>
 </div>
 </div>
+<button class="sensory-toggle" id="sensoryToggle" type="button" aria-pressed="true" aria-label="Toggle sound and haptic feedback">SFX on</button>
 <button class="feedback-btn" id="feedbackButton" onclick="dashboardActions.openFeedback()">Feedback</button>
 <div class="feedback-panel" id="feedbackPanel" aria-hidden="true">
 <div class="feedback-top"><strong>Send Feedback</strong><button onclick="dashboardActions.closeFeedback()" aria-label="Close feedback">Close</button></div>

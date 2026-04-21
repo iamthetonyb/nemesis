@@ -11,11 +11,15 @@
     "deploy:pages": "pnpm dlx wrangler@4.84.1 pages deploy frontend --project-name gov-budget --branch main",
     "generate:nevada": "node tools/generate-nevada-demo.mjs > frontend/data/bootstrap.json",
     "ingest:nevada": "pnpm generate:nevada && node tools/ingest/nevada-state-checkbook.mjs",
-    "check:frontend": "node --check frontend/assets/js/app.js && node --check frontend/assets/js/map.js && node --check tools/generate-nevada-demo.mjs && node --check tools/ingest/nevada-state-checkbook.mjs && node --check tools/ingest/nevada-las-vegas.mjs && node --check tools/ingest/nevada-ccsd.mjs && node --check tools/ingest/nevada-counties.mjs && node --check tools/ingest/nevada-districts.mjs",
+    "check:frontend": "node --check frontend/assets/js/app.js && node --check frontend/assets/js/map.js && node --check frontend/assets/js/sensory.js && node --check tools/generate-nevada-demo.mjs && node --check tools/ingest/nevada-state-checkbook.mjs && node --check tools/ingest/nevada-las-vegas.mjs && node --check tools/ingest/nevada-ccsd.mjs && node --check tools/ingest/nevada-counties.mjs && node --check tools/ingest/nevada-districts.mjs",
     "check:rust": "cargo fmt --check --all && cargo clippy --workspace --all-targets --all-features -- -D warnings && cargo test --workspace",
     "validate:data": "cargo run -q -p spending-validate -- frontend/data/bootstrap.json",
     "check:backend": "pnpm --dir backend audit --prod",
     "context:compile": "node tools/compile-context.mjs",
+    "test:e2e": "playwright test -c tests/playwright.config.js",
     "check": "pnpm check:frontend && pnpm check:rust && pnpm validate:data && pnpm check:backend"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1"
   }
 }
