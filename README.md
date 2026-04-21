@@ -15,6 +15,7 @@ Live demo: [gov-budget.pages.dev](https://gov-budget.pages.dev) · Repo: [iamthe
 - Drill into individual records with source links back to official data
 - Optional sound/haptic feedback for key controls, generated in-browser with no audio files
 - Compressed same-origin hero motion background with static poster fallback
+- Lazy-loaded Turnstile feedback protection only when configured and opened
 
 All displayed claims link to official source snapshots. Labels use "review", "priority", and "needs review" — not accusations of fraud or waste.
 

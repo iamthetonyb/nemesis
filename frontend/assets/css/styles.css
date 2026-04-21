@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,500;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 :root{
   --b0:#050508;--b1:#09090d;--b2:#11100d;--b2h:#1a160d;--bd:#342d18;--ba:#8f7b3d;
   --t1:#f4eddd;--t2:#c9bea5;--t3:#8f866e;
@@ -300,16 +299,26 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;o
   background:linear-gradient(180deg,rgba(9,9,13,.96),var(--b0) 54%,#030304 100%);
 }
 .hero-bg-video{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;
-  opacity:.28;filter:saturate(1.05) contrast(1.1) brightness(.62);transform:scale(1.035);
-  pointer-events:none;z-index:0;
+  position:absolute;inset:-3%;width:106%;height:106%;object-fit:cover;object-position:center;
+  opacity:.48;filter:saturate(1.24) contrast(1.22) brightness(.78);transform:translate3d(0,0,0) scale(1.08);
+  pointer-events:none;z-index:0;will-change:transform,filter,opacity;
 }
 .hero::before{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
-  background-image:radial-gradient(ellipse 70% 50% at 50% 38%,rgba(5,5,8,.1),rgba(5,5,8,.74) 68%,rgba(5,5,8,.92) 100%),linear-gradient(rgba(212,175,55,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(212,175,55,.035) 1px,transparent 1px),linear-gradient(180deg,rgba(74,222,128,.08),transparent 28%,transparent 72%,rgba(212,175,55,.08));
+  background-image:radial-gradient(ellipse 70% 50% at 50% 38%,rgba(5,5,8,.02),rgba(5,5,8,.58) 68%,rgba(5,5,8,.86) 100%),linear-gradient(rgba(212,175,55,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(212,175,55,.035) 1px,transparent 1px),linear-gradient(180deg,rgba(74,222,128,.08),transparent 28%,transparent 72%,rgba(212,175,55,.08));
   background-size:100% 100%,48px 48px,48px 48px,100% 100%;
   mask-image:linear-gradient(180deg,transparent,#000 10%,#000 86%,transparent);
   -webkit-mask-image:linear-gradient(180deg,transparent,#000 10%,#000 86%,transparent);
+}
+.hero::after{
+  content:'';position:absolute;inset:-18%;pointer-events:none;z-index:1;
+  background-image:linear-gradient(104deg,transparent 0 42%,rgba(232,218,135,.18) 48%,rgba(74,222,128,.13) 51%,transparent 58%),
+    repeating-linear-gradient(90deg,transparent 0 74px,rgba(74,222,128,.055) 75px,transparent 77px),
+    repeating-linear-gradient(0deg,transparent 0 82px,rgba(232,218,135,.04) 83px,transparent 85px);
+  background-size:170% 100%,260px 100%,100% 260px;
+  mix-blend-mode:screen;opacity:.48;transform:translate3d(-28%,0,0);will-change:transform,background-position,opacity;
+  mask-image:linear-gradient(180deg,transparent,#000 14%,#000 84%,transparent);
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 14%,#000 84%,transparent);
 }
 .hero-fade-btm{position:absolute;bottom:0;left:0;right:0;height:160px;pointer-events:none;background:linear-gradient(transparent,var(--b0));z-index:2}
 .hero-inner{position:relative;z-index:3;max-width:960px;width:100%}
@@ -474,7 +483,8 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;o
 }
 @media(max-width:640px){
   .hero{min-height:100svh;padding:78px 18px 90px}
-  .hero-bg-video{opacity:.2;object-position:center top}
+  .hero-bg-video{opacity:.36;object-position:center top;filter:saturate(1.2) contrast(1.18) brightness(.72)}
+  .hero::after{opacity:.34;background-size:190% 100%,220px 100%,100% 220px}
   .hero h1{letter-spacing:-1.4px}
   .btn{min-height:44px;padding:12px 18px;font-size:12.5px}
   .btn-map{min-width:100%;min-height:88px;gap:9px;padding:18px 14px 30px;border-radius:26px}
@@ -494,11 +504,28 @@ html[data-motion="on"] .scroll-cue{animation:hero-up 1s ease 1s both,hero-bob 2.
 html[data-motion="on"] .sp{animation:sparkle 3s ease-in-out infinite}
 html[data-motion="on"] .hero-kicker .hero-dot{animation:pls 2s infinite}
 html[data-motion="on"] .money{animation:money-glow 2s ease-in-out infinite}
-html[data-motion="off"] .hero-bg-video{display:none}
+html[data-motion="on"] .hero-bg-video{animation:hero-video-drift 16s ease-in-out infinite alternate}
+html[data-motion="on"] .hero::after{animation:hero-scan 6.8s ease-in-out infinite,hero-grid-drift 18s linear infinite}
+html[data-video-motion="blocked"] .hero-bg-video{opacity:.42}
+html[data-motion="off"] .hero-bg-video,html[data-motion="off"] .hero::after{display:none}
 html[data-motion="off"] .money,html[data-motion="off"] .sp,html[data-motion="off"] .btn-map,html[data-motion="off"] .btn-map::before,html[data-motion="off"] .btn-map::after,html[data-motion="off"] .btn-money-mark::after,html[data-motion="off"] .scroll-cue,html[data-motion="off"] .hero-kicker .hero-dot,html[data-motion="off"] .kc{animation:none!important;transition:none!important}
 html[data-motion="off"] .hero-kicker,html[data-motion="off"] .hero h1,html[data-motion="off"] .hero-sub,html[data-motion="off"] .hero-stats,html[data-motion="off"] .hero-cta{animation:none!important;transition:none!important}
 html[data-motion="off"] .sp{opacity:0}
 html[data-motion="off"] .scroll-cue{opacity:1;transform:translateX(-50%)}
 html[data-motion="off"] .btn-map:hover,html[data-motion="off"] .btn-map:focus-visible{
   transform:none;
+}
+@keyframes hero-video-drift{
+  0%{transform:translate3d(-1.8%,-1%,0) scale(1.08);filter:saturate(1.14) contrast(1.14) brightness(.72)}
+  45%{transform:translate3d(1.4%,.8%,0) scale(1.115);filter:saturate(1.32) contrast(1.24) brightness(.82)}
+  100%{transform:translate3d(-.6%,1.8%,0) scale(1.095);filter:saturate(1.2) contrast(1.2) brightness(.76)}
+}
+@keyframes hero-scan{
+  0%,14%{transform:translate3d(-38%,0,0);opacity:.22}
+  46%{transform:translate3d(10%,0,0);opacity:.54}
+  72%,100%{transform:translate3d(34%,0,0);opacity:.28}
+}
+@keyframes hero-grid-drift{
+  0%{background-position:0 0,0 0,0 0}
+  100%{background-position:180% 0,260px 0,0 260px}
 }

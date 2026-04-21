@@ -208,7 +208,18 @@
     const source = video.dataset.src;
 
     if (motionEnabled && source) {
+      document.documentElement.dataset.videoMotion = 'loading';
       if (!video.getAttribute('src')) {
+        video.defaultMuted = true;
+        video.muted = true;
+        video.autoplay = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.setAttribute('autoplay', '');
+        video.setAttribute('muted', '');
+        video.setAttribute('loop', '');
+        video.setAttribute('playsinline', '');
+        video.setAttribute('webkit-playsinline', '');
         video.setAttribute('src', source);
         video.load();
       }
@@ -218,12 +229,21 @@
       video.dataset.enabled = 'true';
       const playResult = video.play();
       if (playResult && typeof playResult.catch === 'function') {
-        playResult.catch(() => {});
+        playResult
+          .then(() => {
+            document.documentElement.dataset.videoMotion = 'playing';
+          })
+          .catch(() => {
+            document.documentElement.dataset.videoMotion = 'blocked';
+          });
+      } else {
+        document.documentElement.dataset.videoMotion = 'playing';
       }
       return;
     }
 
     video.dataset.enabled = 'false';
+    document.documentElement.dataset.videoMotion = 'off';
     video.pause();
     if (video.getAttribute('src')) {
       video.removeAttribute('src');

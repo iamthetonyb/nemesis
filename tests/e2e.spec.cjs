@@ -15,6 +15,23 @@ test("desktop dashboard core UI works", async ({ page }) => {
   await expect(page.locator(".sound-toggle")).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".hero-bg-video")).toHaveAttribute("poster", /hero-poster\.jpg/);
   await expect.poll(() => page.locator(".hero-bg-video").evaluate((node) => node.getAttribute("src") || "")).toContain("hero-motion.mp4");
+  const heroMotion = await page.evaluate(async () => {
+    const hero = document.querySelector(".hero");
+    const video = document.querySelector(".hero-bg-video");
+    const startTime = video.currentTime;
+    const startTransform = getComputedStyle(video).transform;
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    return {
+      videoDelta: video.currentTime - startTime,
+      transformChanged: getComputedStyle(video).transform !== startTransform,
+      videoAnimation: getComputedStyle(video).animationName,
+      overlayAnimation: getComputedStyle(hero, "::after").animationName,
+    };
+  });
+  expect(heroMotion.videoDelta).toBeGreaterThan(0.2);
+  expect(heroMotion.transformChanged).toBe(true);
+  expect(heroMotion.videoAnimation).toContain("hero-video-drift");
+  expect(heroMotion.overlayAnimation).toContain("hero-scan");
   await expect(page.locator('input[placeholder="Search jurisdiction..."]')).toBeVisible();
   await expect(page.locator(".maplibregl-canvas")).toBeVisible();
 
@@ -42,9 +59,10 @@ test("desktop dashboard core UI works", async ({ page }) => {
     sparkle: getComputedStyle(document.querySelector(".sp")).animationName,
     scrollCue: getComputedStyle(document.querySelector(".scroll-cue")).animationName,
     mapButton: getComputedStyle(document.querySelector(".btn-map")).animationName,
+    heroOverlay: getComputedStyle(document.querySelector(".hero"), "::after").display,
     videoSrc: document.querySelector(".hero-bg-video").getAttribute("src") || "",
   }));
-  expect(offMotion).toEqual({ sparkle: "none", scrollCue: "none", mapButton: "none", videoSrc: "" });
+  expect(offMotion).toEqual({ sparkle: "none", scrollCue: "none", mapButton: "none", heroOverlay: "none", videoSrc: "" });
   await page.locator(".sensory-toggle").click();
   await expect(page.locator(".sensory-toggle")).toHaveText("FX on");
 

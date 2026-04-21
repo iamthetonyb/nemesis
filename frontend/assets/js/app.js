@@ -73,6 +73,7 @@
   let dashboardData = null;
   let regionsByKey = new Map();
   let provincesByKey = new Map();
+  let turnstileLoadPromise = null;
 
   function escapeHtml(value) {
     return String(value)
@@ -1602,6 +1603,37 @@
     document.getElementById("sidebar")?.classList.toggle("expanded");
   }
 
+  function loadTurnstile() {
+    if (!window.TURNSTILE_SITE_KEY) return Promise.resolve(null);
+    if (window.turnstile) return Promise.resolve(window.turnstile);
+    if (turnstileLoadPromise) return turnstileLoadPromise;
+
+    turnstileLoadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+      script.async = true;
+      script.defer = true;
+      script.onload = () => resolve(window.turnstile || null);
+      script.onerror = () => reject(new Error("Turnstile failed to load"));
+      document.head.appendChild(script);
+    }).catch(() => null);
+
+    return turnstileLoadPromise;
+  }
+
+  async function renderTurnstile(container, siteKey) {
+    const turnstile = await loadTurnstile();
+    if (!turnstile || !container || !siteKey || !document.body.contains(container)) return;
+    container.innerHTML = "";
+    window._turnstileToken = null;
+    turnstile.render(container, {
+      sitekey: siteKey,
+      theme: "dark",
+      callback: (token) => { window._turnstileToken = token; },
+      "expired-callback": () => { window._turnstileToken = null; },
+    });
+  }
+
   function openFeedback() {
     const panel = document.getElementById("feedbackPanel");
     if (!panel) return;
@@ -1614,15 +1646,8 @@
 
     const siteKey = window.TURNSTILE_SITE_KEY;
     const container = document.getElementById("turnstileContainer");
-    if (siteKey && container && window.turnstile) {
-      container.innerHTML = "";
-      window._turnstileToken = null;
-      window.turnstile.render(container, {
-        sitekey: siteKey,
-        theme: "dark",
-        callback: (token) => { window._turnstileToken = token; },
-        "expired-callback": () => { window._turnstileToken = null; },
-      });
+    if (siteKey && container) {
+      renderTurnstile(container, siteKey);
     }
   }
 
