@@ -80,7 +80,7 @@ window.AuditMap = (() => {
 
     geo.features
       .filter((feature) => feature.properties && feature.properties.labelText && feature.properties.fillOpacity > 0.08)
-      .sort((left, right) => (left.properties.labelPriority || 0) - (right.properties.labelPriority || 0))
+      .sort((left, right) => (left.properties.labelZIndex || 0) - (right.properties.labelZIndex || 0))
       .forEach((feature) => {
         const center = computeFeatureCenter(feature);
         if (!center) {
@@ -91,6 +91,9 @@ window.AuditMap = (() => {
         element.type = "button";
         element.className = `map-label map-label-${feature.properties.labelKind || "area"}`;
         element.textContent = feature.properties.labelText;
+        element.style.zIndex = String(feature.properties.labelZIndex || feature.properties.labelPriority || 0);
+        element.dataset.areaKey = getFeatureAreaKey(feature.properties) || "";
+        element.dataset.labelKind = feature.properties.labelKind || "area";
         element.addEventListener("click", (event) => {
           event.stopPropagation();
           const areaKey = getFeatureAreaKey(feature.properties);

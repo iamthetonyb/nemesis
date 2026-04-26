@@ -1,12 +1,20 @@
-use std::{collections::HashSet, env, fs, path::PathBuf, process};
+use std::{
+    collections::{HashMap, HashSet},
+    env, fs, io,
+    path::{Path, PathBuf},
+    process,
+};
 
 use serde_json::Value;
+use sha2::{Digest, Sha256};
 
 fn main() {
-    let path = env::args_os().nth(1).map_or_else(
+    let mut args = env::args_os().skip(1);
+    let path = args.next().map_or_else(
         || PathBuf::from("frontend/data/bootstrap.json"),
         PathBuf::from,
     );
+    let manifest = args.next().map(PathBuf::from);
 
     match validate_path(&path) {
         Ok(report) => {
@@ -26,6 +34,24 @@ fn main() {
             process::exit(1);
         }
     }
+
+    if let Some(manifest) = manifest {
+        match validate_manifest(&manifest) {
+            Ok(report) => println!(
+                "verified {}: {} files, {} bytes",
+                manifest.display(),
+                report.files,
+                report.bytes
+            ),
+            Err(errors) => {
+                eprintln!("manifest validation failed for {}", manifest.display());
+                for error in errors {
+                    eprintln!("- {error}");
+                }
+                process::exit(1);
+            }
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -33,6 +59,12 @@ struct Report {
     regions: usize,
     packages: usize,
     sources: usize,
+}
+
+#[derive(Debug)]
+struct ManifestReport {
+    files: usize,
+    bytes: u64,
 }
 
 fn validate_path(path: &PathBuf) -> Result<Report, Vec<String>> {
@@ -47,6 +79,125 @@ fn validate_path(path: &PathBuf) -> Result<Report, Vec<String>> {
     };
 
     validate_root(&root)
+}
+
+fn validate_manifest(path: &Path) -> Result<ManifestReport, Vec<String>> {
+    let raw = match fs::read_to_string(path) {
+        Ok(raw) => raw,
+        Err(error) => return Err(vec![format!("could not read manifest: {error}")]),
+    };
+
+    let manifest: Value = match serde_json::from_str(&raw) {
+        Ok(value) => value,
+        Err(error) => return Err(vec![format!("invalid manifest JSON: {error}")]),
+    };
+
+    let root_dir = path
+        .parent()
+        .and_then(Path::parent)
+        .unwrap_or_else(|| Path::new("frontend"));
+
+    validate_manifest_root(&manifest, root_dir, path)
+}
+
+fn validate_manifest_root(
+    manifest: &Value,
+    root_dir: &Path,
+    manifest_path: &Path,
+) -> Result<ManifestReport, Vec<String>> {
+    let mut errors = Vec::new();
+
+    if manifest.get("schema_version").and_then(Value::as_u64) != Some(1) {
+        errors.push("manifest.schema_version must be 1".to_string());
+    }
+    if manifest.get("algorithm").and_then(Value::as_str) != Some("sha256") {
+        errors.push("manifest.algorithm must be sha256".to_string());
+    }
+    if manifest.get("root").and_then(Value::as_str) != Some("frontend") {
+        errors.push("manifest.root must be frontend".to_string());
+    }
+
+    let Some(files) = manifest.get("files").and_then(Value::as_array) else {
+        errors.push("manifest.files must be an array".to_string());
+        return Err(errors);
+    };
+
+    if files.is_empty() {
+        errors.push("manifest.files must not be empty".to_string());
+    }
+
+    let expected_files = match public_files(root_dir, manifest_path) {
+        Ok(files) => files,
+        Err(error) => {
+            errors.push(format!("could not list public files: {error}"));
+            HashMap::new()
+        }
+    };
+
+    let mut seen = HashSet::new();
+    let mut total_bytes = 0_u64;
+    let mut previous_path: Option<String> = None;
+
+    for (index, entry) in files.iter().enumerate() {
+        let prefix = format!("manifest.files[{index}]");
+        let path_value = required_string(entry, "path", &prefix, &mut errors);
+        let sha_value = required_string(entry, "sha256", &prefix, &mut errors);
+        let declared_bytes = entry.get("bytes").and_then(Value::as_u64);
+
+        let Some(path_value) = path_value else {
+            continue;
+        };
+
+        if !is_safe_manifest_path(path_value) {
+            errors.push(format!("{prefix}.path is not a safe public relative path"));
+            continue;
+        }
+        if let Some(previous) = previous_path.as_ref()
+            && previous.as_str() >= path_value
+        {
+            errors.push(format!("{prefix}.path must be sorted ascending"));
+        }
+        previous_path = Some(path_value.to_string());
+
+        if !seen.insert(path_value.to_string()) {
+            errors.push(format!("{prefix}.path is duplicated: {path_value}"));
+        }
+
+        let Some(actual) = expected_files.get(path_value) else {
+            errors.push(format!("{prefix}.path is not a generated public file"));
+            continue;
+        };
+
+        if declared_bytes != Some(actual.bytes) {
+            errors.push(format!(
+                "{prefix}.bytes must equal actual file size ({})",
+                actual.bytes
+            ));
+        }
+        if let Some(sha_value) = sha_value {
+            if sha_value.len() != 64 || !sha_value.chars().all(|char| char.is_ascii_hexdigit()) {
+                errors.push(format!("{prefix}.sha256 must be a 64-character hex digest"));
+            } else if !sha_value.eq_ignore_ascii_case(&actual.sha256) {
+                errors.push(format!("{prefix}.sha256 does not match file hash"));
+            }
+        }
+        total_bytes = total_bytes.saturating_add(actual.bytes);
+    }
+
+    for path in expected_files.keys() {
+        if !seen.contains(path) {
+            errors.push(format!("manifest.files is missing public file `{path}`"));
+        }
+    }
+
+    if errors.is_empty() {
+        Ok(ManifestReport {
+            files: seen.len(),
+            bytes: total_bytes,
+        })
+    } else {
+        Err(errors)
+    }
 }
 
 fn validate_root(root: &Value) -> Result<Report, Vec<String>> {
@@ -100,6 +251,80 @@ fn validate_root(root: &Value) -> Result<Report, Vec<String>> {
     } else {
         Err(errors)
     }
+}
+
+struct FileDigest {
+    bytes: u64,
+    sha256: String,
+}
+
+fn public_files(root: &Path, manifest_path: &Path) -> io::Result<HashMap<String, FileDigest>> {
+    let root = root.canonicalize()?;
+    let manifest_path = manifest_path.canonicalize().ok();
+    let mut files = HashMap::new();
+    collect_public_files(&root, &root, manifest_path.as_deref(), &mut files)?;
+    Ok(files)
+}
+
+fn collect_public_files(
+    root: &Path,
+    current: &Path,
+    manifest_path: Option<&Path>,
+    files: &mut HashMap<String, FileDigest>,
+) -> io::Result<()> {
+    for item in fs::read_dir(current)? {
+        let item = item?;
+        let path = item.path();
+        if path.is_dir() {
+            collect_public_files(root, &path, manifest_path, files)?;
+            continue;
+        }
+        if !path.is_file() || manifest_path.is_some_and(|manifest| manifest == path) {
+            continue;
+        }
+        let relative = path
+            .strip_prefix(root)
+            .map_or_else(|_| normalize_path(&path), normalize_path);
+        if !is_manifest_public_file(&relative) {
+            continue;
+        }
+        let bytes = fs::read(&path)?;
+        let digest = Sha256::digest(&bytes);
+        files.insert(
+            relative,
+            FileDigest {
+                bytes: u64::try_from(bytes.len()).unwrap_or(u64::MAX),
+                sha256: format!("{digest:x}"),
+            },
+        );
+    }
+    Ok(())
+}
+
+fn is_manifest_public_file(path: &str) -> bool {
+    path == "index.html"
+        || path == "robots.txt"
+        || path == "_headers"
+        || path.starts_with("data/")
+        || path.starts_with("assets/css/")
+        || path.starts_with("assets/js/")
+        || path.starts_with("assets/media/")
+}
+
+fn is_safe_manifest_path(path: &str) -> bool {
+    !path.starts_with('/')
+        && !path.contains('\\')
+        && path
+            .split('/')
+            .all(|part| !part.is_empty() && part != "." && part != "..")
+        && is_manifest_public_file(path)
+}
+
+fn normalize_path(path: &Path) -> String {
+    path.components()
+        .map(|component| component.as_os_str().to_string_lossy())
+        .collect::<Vec<_>>()
+        .join("/")
 }
 
 fn validate_sources(root: &Value, errors: &mut Vec<String>) -> usize {
@@ -608,9 +833,16 @@ fn https_host(url: &str) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use serde_json::{Value, json};
+    use std::{
+        fs,
+        path::{Path, PathBuf},
+        time::{SystemTime, UNIX_EPOCH},
+    };
 
-    use super::validate_root;
+    use serde_json::{Value, json};
+    use sha2::{Digest, Sha256};
+
+    use super::{validate_manifest_root, validate_root};
 
     fn valid_fixture() -> Value {
         json!({
@@ -744,5 +976,82 @@ mod tests {
                 .iter()
                 .any(|error| error.contains("closed linear ring"))
         );
+    }
+
+    #[test]
+    fn accepts_valid_manifest_fixture() {
+        let root = temp_root("valid-manifest");
+        write_fixture_file(&root, "index.html", b"<main>ok</main>");
+        write_fixture_file(&root, "assets/js/app.js", b"console.log('ok');");
+        write_fixture_file(&root, "data/bootstrap.json", br#"{"ok":true}"#);
+
+        let manifest = manifest_for(
+            &root,
+            &["assets/js/app.js", "data/bootstrap.json", "index.html"],
+        );
+        let report = validate_manifest_root(&manifest, &root, &root.join("data/manifest.json"))
+            .expect("valid manifest should pass");
+
+        assert_eq!(report.files, 3);
+        fs::remove_dir_all(root).ok();
+    }
+
+    #[test]
+    fn rejects_tampered_manifest_hash() {
+        let root = temp_root("tampered-manifest");
+        write_fixture_file(&root, "index.html", b"<main>ok</main>");
+
+        let mut manifest = manifest_for(&root, &["index.html"]);
+        manifest["files"][0]["sha256"] =
+            json!("0000000000000000000000000000000000000000000000000000000000000000");
+
+        let errors = validate_manifest_root(&manifest, &root, &root.join("data/manifest.json"))
+            .expect_err("tampered manifest should fail");
+
+        assert!(
+            errors
+                .iter()
+                .any(|error| error.contains("does not match file hash"))
+        );
+        fs::remove_dir_all(root).ok();
+    }
+
+    fn temp_root(label: &str) -> PathBuf {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("system time should be valid")
+            .as_nanos();
+        let root = std::env::temp_dir().join(format!(
+            "spending-validate-{label}-{}-{nonce}",
+            std::process::id()
+        ));
+        fs::remove_dir_all(&root).ok();
+        fs::create_dir_all(&root).expect("test root should be creatable");
+        root
+    }
+
+    fn write_fixture_file(root: &Path, relative: &str, body: &[u8]) {
+        let path = root.join(relative);
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent).expect("fixture directory should be creatable");
+        }
+        fs::write(path, body).expect("fixture file should be writable");
+    }
+
+    fn manifest_for(root: &Path, paths: &[&str]) -> Value {
+        json!({
+            "schema_version": 1,
+            "algorithm": "sha256",
+            "root": "frontend",
+            "files": paths.iter().map(|path| {
+                let body = fs::read(root.join(path)).expect("fixture file should exist");
+                let digest = Sha256::digest(&body);
+                json!({
+                    "path": path,
+                    "bytes": body.len(),
+                    "sha256": format!("{digest:x}")
+                })
+            }).collect::<Vec<_>>()
+        })
     }
 }

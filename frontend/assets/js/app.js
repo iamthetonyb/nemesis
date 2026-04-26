@@ -12,6 +12,7 @@
   const state = {
     mapFilter: "all",
     tab: "county",
+    lastAreaTab: "county",
     selectedAreaKey: null,
     selectedOwnerKey: null,
     search: "",
@@ -833,6 +834,7 @@
       labelText: visible ? area?.displayName || "" : "",
       labelKind: districtBoundary ? "district" : largeBoundary ? "boundary" : "area",
       labelPriority: selected ? 9 : districtBoundary ? 6 : largeBoundary ? 1 : 3,
+      labelZIndex: selected ? 90 : largeBoundary ? 70 : districtBoundary ? 30 : 50,
     };
   }
 
@@ -1472,6 +1474,7 @@
     }
 
     state.tab = value;
+    state.lastAreaTab = value;
     refreshMapStyles();
     renderTabs();
     renderSidebarContent();
@@ -1480,12 +1483,14 @@
   function setMapFilter(value) {
     const wasProvinceView = isProvinceView();
     const wasCentralOwnerMode = isCentralOwnerMode();
+    const wasAggregateMode = wasProvinceView || wasCentralOwnerMode;
     state.mapFilter = value;
     const viewChanged = wasProvinceView !== isProvinceView();
     const centralOwnerModeChanged = wasCentralOwnerMode !== isCentralOwnerMode();
+    const isAggregateMode = isProvinceView() || isCentralOwnerMode();
 
     if (viewChanged) {
-      state.tab = "all";
+      state.tab = isAggregateMode ? "all" : state.lastAreaTab || "county";
       state.selectedAreaKey = null;
       state.selectedOwnerKey = null;
       closeRegionModal();
@@ -1498,13 +1503,17 @@
     }
 
     if (centralOwnerModeChanged) {
-      state.tab = "all";
+      state.tab = isAggregateMode ? "all" : state.lastAreaTab || "county";
       state.selectedAreaKey = null;
       state.selectedOwnerKey = null;
 
       if (state.modal.areaType === "owner" && !isCentralOwnerMode()) {
         closeRegionModal();
       }
+    }
+
+    if (wasAggregateMode && !isAggregateMode) {
+      state.tab = state.lastAreaTab || "county";
     }
 
     refreshMapStyles();

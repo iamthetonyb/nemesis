@@ -115,19 +115,25 @@ jobs:
       - name: Validate bootstrap.json (Rust gate)
         run: pnpm validate:data
 
+      - name: Generate public artifact manifest
+        run: pnpm manifest
+
+      - name: Verify public artifact manifest
+        run: cargo run -q -p spending-validate -- frontend/data/bootstrap.json frontend/data/manifest.json
+
       # --- Commit and push if data changed ---
 
       - name: Check for changes
         id: diff
         run: |
-          git diff --quiet frontend/data/bootstrap.json && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+          git diff --quiet frontend/data/bootstrap.json frontend/data/manifest.json && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: Commit updated data
         if: ${{ steps.diff.outputs.changed == 'true' && github.event.inputs.dry_run != 'true' }}
         run: |
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git add frontend/data/bootstrap.json
+          git add frontend/data/bootstrap.json frontend/data/manifest.json
           DATE=$(date -u +%Y-%m-%d)
           git commit -m "data: Nevada refresh ${DATE} [skip ci]"
           git push

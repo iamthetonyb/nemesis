@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "algorithm": "sha256",
+  "root": "frontend",
+  "files": [
+    {
+      "path": "_headers",
+      "bytes": 1750,
+      "sha256": "6ba69e2d72ae383a749b80b2d264d35ee277048bd22ae58526e71ada0926b836"
+    },
+    {
+      "path": "assets/css/styles.css",
+      "bytes": 43434,
+      "sha256": "0087fbbe7f65acb358af10364046aa3406d8b2bb50b8d4d293830238c5146a95"
+    },
+    {
+      "path": "assets/js/app.js",
+      "bytes": 66286,
+      "sha256": "8991f2500980a2367234567db50853b8735d037386e36cb0f3e3e8f43020875e"
+    },
+    {
+      "path": "assets/js/config.js",
+      "bytes": 320,
+      "sha256": "d31dfbfd048270ad0936005eb4b43980f13330be3e1688cb4989625d4ac2aa7a"
+    },
+    {
+      "path": "assets/js/map.js",
+      "bytes": 9255,
+      "sha256": "45fe001da32250d4710ca5606f91b50857bbf2c6f26cd112fce0daa3bf026042"
+    },
+    {
+      "path": "assets/js/sensory.js",
+      "bytes": 10846,
+      "sha256": "0cf567f256f4366c9948c025e1fb8eef7cbbb89dd89336a56e34d9e626f17b1a"
+    },
+    {
+      "path": "assets/media/hero-motion.mp4",
+      "bytes": 897205,
+      "sha256": "06ed9e2cc0befb175fecd7f24caaa8beae48acc0ae548e412510569ba479c566"
+    },
+    {
+      "path": "assets/media/hero-poster.jpg",
+      "bytes": 50659,
+      "sha256": "d0355f22ee3d76d1184f4363c464b387ea975386af0051e5e020b24e88d3bcfe"
+    },
+    {
+      "path": "data/bootstrap.json",
+      "bytes": 157138,
+      "sha256": "b876dc71964a7b6b1fa6d6236b96c53087d090698f5de84670fe19ecb5384467"
+    },
+    {
+      "path": "index.html",
+      "bytes": 10067,
+      "sha256": "0430adf5ec2a90d08b16ba64de72d658eb41e7f5aeda231da75be71bd47509ee"
+    },
+    {
+      "path": "robots.txt",
+      "bytes": 27,
+      "sha256": "32403248dc764535c87140955fc9451f9ebc9702f3e298d1c24fe84e558a53a9"
+    }
+  ]
+}

@@ -46,6 +46,7 @@ frontend/
   assets/css/styles.css       All styles
   assets/media/               Hero video + poster assets
   data/bootstrap.json         Pre-generated jurisdiction + GeoJSON data
+  data/manifest.json          SHA-256 public artifact manifest
   _headers                    Cloudflare Pages security headers (CSP, HSTS, etc.)
 
 backend/                      Node.js + Express 5 + SQLite (optional, full dataset)
@@ -101,6 +102,7 @@ python3 -m http.server 8080
 ```bash
 pnpm generate:nevada   # regenerate frontend/data/bootstrap.json
 pnpm validate:data     # Rust validator — verifies source URLs, GeoJSON, key integrity
+pnpm manifest          # regenerate frontend/data/manifest.json SHA-256 hashes
 pnpm check             # full gate: JS + Rust (fmt/clippy/test) + data + backend audit
 ```
 

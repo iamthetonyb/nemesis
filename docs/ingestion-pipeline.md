@@ -9,6 +9,7 @@ generate-nevada-demo.mjs (federal baseline: USAspending + TIGERweb)
   → tools/ingest/*.mjs (augment: state checkbook, counties, cities, districts)
   → bootstrap.json
   → cargo run -p spending-validate (hard gate)
+  → cargo run -p spending-manifest (public SHA-256 manifest)
   → git commit → Cloudflare Pages deploy
 ```
 
@@ -25,8 +26,9 @@ The workflow:
 1. Generates `bootstrap.json` from federal sources (USAspending + TIGERweb)
 2. Runs each augmentation script (failures are non-fatal individually)
 3. Runs the Rust validator — **hard gate**: if validation fails, nothing commits
-4. Commits + pushes only if bootstrap.json changed
-5. Cloudflare Pages auto-deploys on push (enable GitHub integration in CF dashboard)
+4. Generates and verifies `frontend/data/manifest.json`
+5. Commits + pushes only if bootstrap.json or manifest.json changed
+6. Cloudflare Pages auto-deploys on push (enable GitHub integration in CF dashboard)
 
 **Result:** Data stays fresh forever with no VPS, no cron daemon, no manual work.
 
@@ -60,6 +62,9 @@ INGEST_DRY_RUN=true node tools/ingest/nevada-state-checkbook.mjs
 # Validate after any ingestion
 pnpm validate:data
 
+# Regenerate public artifact hash manifest
+pnpm manifest
+
 # Full gate (JS syntax + Rust + validate + backend audit)
 pnpm check
 ```
@@ -80,6 +85,9 @@ Run a specific subset of sources from GitHub Actions:
 Raw snapshots are stored in `data/raw/{source}/{file}-fy{year}.json`.  
 This directory is in `.gitignore` — raw files stay local / on the Actions runner.  
 Only `frontend/data/bootstrap.json` is committed to the repo.
+
+`frontend/data/manifest.json` is also committed. It lists each public frontend artifact,
+its byte length, and its SHA-256 digest so anyone can verify the deployed files.
 
 For long-term archiving: store raw snapshots in Cloudflare R2 or Backblaze B2.  
 See `docs/free-tier-and-security-strategy.md` for the R2 setup plan.
@@ -123,5 +131,6 @@ The Rust validator (`crates/spending-validate/`) enforces:
 - GeoJSON geometry: valid WGS84 coordinates, closed polygon rings
 - No duplicate IDs in packages
 - `summary.totalPackages` must equal `packageSamples.length`
+- `manifest.json` paths, sizes, and SHA-256 hashes match the public frontend files
 
 If validation fails, the GitHub Actions workflow aborts before committing.

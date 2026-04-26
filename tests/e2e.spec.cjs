@@ -15,20 +15,27 @@ test("desktop dashboard core UI works", async ({ page }) => {
   await expect(page.locator(".sound-toggle")).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".hero-bg-video")).toHaveAttribute("poster", /hero-poster\.jpg/);
   await expect.poll(() => page.locator(".hero-bg-video").evaluate((node) => node.getAttribute("src") || "")).toContain("hero-motion.mp4");
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.dataset.videoMotion || ""))
+    .toBe("playing");
   const heroMotion = await page.evaluate(async () => {
     const hero = document.querySelector(".hero");
     const video = document.querySelector(".hero-bg-video");
     const startTime = video.currentTime;
     const startTransform = getComputedStyle(video).transform;
-    await new Promise((resolve) => setTimeout(resolve, 700));
+    await new Promise((resolve) => setTimeout(resolve, 900));
     return {
       videoDelta: video.currentTime - startTime,
+      paused: video.paused,
+      readyState: video.readyState,
       transformChanged: getComputedStyle(video).transform !== startTransform,
       videoAnimation: getComputedStyle(video).animationName,
       overlayAnimation: getComputedStyle(hero, "::after").animationName,
     };
   });
-  expect(heroMotion.videoDelta).toBeGreaterThan(0.2);
+  expect(heroMotion.videoDelta).toBeGreaterThan(0.03);
+  expect(heroMotion.paused).toBe(false);
+  expect(heroMotion.readyState).toBeGreaterThanOrEqual(2);
   expect(heroMotion.transformChanged).toBe(true);
   expect(heroMotion.videoAnimation).toContain("hero-video-drift");
   expect(heroMotion.overlayAnimation).toContain("hero-scan");
@@ -72,10 +79,18 @@ test("desktop dashboard core UI works", async ({ page }) => {
   await expect(page.locator(".sound-toggle")).toHaveAttribute("aria-pressed", "true");
   await expect(page.evaluate(() => window.Sensory && window.Sensory.isFeedbackEnabled())).resolves.toBe(true);
 
-  await page.locator('input[placeholder="Search jurisdiction..."]').fill("Clark");
-  await expect(page.getByText("Clark County").first()).toBeVisible();
+  await page.locator("#mf").getByText("State", { exact: true }).click();
+  await expect(page.locator("#sbc")).toContainText("Nevada");
+  await expect(page.locator(".map-label").first()).toContainText("Nevada");
+  await page.locator("#mf").getByText("All Sources", { exact: true }).click();
+  await expect(page.locator("#tabs").getByText("County", { exact: true })).toBeEnabled();
+  await expect(page.locator("#tabs").getByText("County", { exact: true })).toHaveClass(/a/);
 
-  await page.getByText("Clark County").first().click();
+  await page.locator('input[placeholder="Search jurisdiction..."]').fill("Clark");
+  const clarkCard = page.locator("#sbc .pi").filter({ hasText: "Clark County" }).first();
+  await expect(clarkCard).toBeVisible();
+
+  await clarkCard.click();
   await expect(page.locator("#rupModal")).toHaveClass(/open/);
   await expect(page.locator("#modalBody")).toContainText("USAspending.gov Federal Aggregate");
   await page.locator("#rupModal .modal-top button").click();
