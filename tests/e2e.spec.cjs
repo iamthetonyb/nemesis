@@ -1,4 +1,5 @@
 const { test, expect } = require("playwright/test");
+const AxeBuilder = require("@axe-core/playwright").default;
 
 const url = process.env.E2E_URL || "http://127.0.0.1:8091/";
 
@@ -9,8 +10,17 @@ test("desktop dashboard core UI works", async ({ page }) => {
   await page.goto(url, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => window.dashboardActions && document.querySelector(".maplibregl-canvas"));
 
-  await expect(page.locator(".hdr-t h1")).toHaveText("USA Spending Watch");
+  await expect(page.locator(".hdr-t .app-title")).toHaveText("USA Spending Watch");
   await expect(page.locator(".logo")).toHaveText("USA");
+  await expect(page.locator("h1")).toHaveCount(1);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /gov-budget\.pages\.dev/);
+  await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(1);
+  const externalAssets = await page.evaluate(() =>
+    [...document.querySelectorAll("script[src],link[href]")]
+      .map((node) => node.getAttribute("src") || node.getAttribute("href") || "")
+      .filter((url) => /fonts\.googleapis|fonts\.gstatic|unpkg/.test(url))
+  );
+  expect(externalAssets).toEqual([]);
   await expect(page.locator(".sensory-toggle")).toHaveText("FX on");
   await expect(page.locator(".sound-toggle")).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".hero-bg-video")).toHaveAttribute("poster", /hero-poster\.jpg/);
@@ -110,7 +120,7 @@ test("mobile HUD controls do not overlap", async ({ page }) => {
   await page.goto(url, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => window.dashboardActions && document.querySelector(".maplibregl-ctrl-top-left"));
 
-  await expect(page.locator(".hdr-t h1")).toHaveText("USA Spending Watch");
+  await expect(page.locator(".hdr-t .app-title")).toHaveText("USA Spending Watch");
   await expect(page.locator(".sensory-toggle")).toBeVisible();
   await expect(page.locator(".sound-toggle")).toBeVisible();
   await expect(page.locator('input[placeholder="Search jurisdiction..."]')).toBeVisible();
@@ -161,4 +171,29 @@ test("mobile HUD controls do not overlap", async ({ page }) => {
 
   await page.locator("#feedbackButton").click();
   await expect(page.locator("#feedbackPanel")).toHaveClass(/open/);
+});
+
+test("core content remains readable without JavaScript", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto(url, { waitUntil: "domcontentloaded" });
+
+  await expect(page.locator("h1")).toContainText("Where your");
+  await expect(page.locator(".no-js")).toContainText("FY 2026");
+  await expect(page.locator(".no-js img")).toHaveAttribute("width", "1280");
+  await expect(page.locator(".no-js img")).toHaveAttribute("height", "672");
+
+  await context.close();
+});
+
+test("home page has no WCAG AA axe violations", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto(url, { waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => window.dashboardActions && document.querySelector(".maplibregl-canvas"));
+
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+    .analyze();
+
+  expect(results.violations).toEqual([]);
 });

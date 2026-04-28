@@ -9,19 +9,19 @@ importers:
   .:
     dependencies:
       better-sqlite3:
-        specifier: ^12.9.0
+        specifier: 12.9.0
         version: 12.9.0
       cors:
-        specifier: ^2.8.6
+        specifier: 2.8.6
         version: 2.8.6
       dotenv:
-        specifier: ^17.4.2
+        specifier: 17.4.2
         version: 17.4.2
       express:
-        specifier: ^5.2.1
+        specifier: 5.2.1
         version: 5.2.1
       express-rate-limit:
-        specifier: ^8.3.2
+        specifier: 8.3.2
         version: 8.3.2(express@5.2.1)
 
 packages:

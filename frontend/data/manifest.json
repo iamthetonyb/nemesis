@@ -4,19 +4,54 @@
   "root": "frontend",
   "files": [
     {
+      "path": ".well-known/security.txt",
+      "bytes": 215,
+      "sha256": "52d2bdd001dfe823f8d70797f06b8963704a061579483457786f2836fbca691d"
+    },
+    {
+      "path": "404.html",
+      "bytes": 1663,
+      "sha256": "e6a0b3517f0ba21d81bd41f0ef7f37778ec3a9b35ba833f7f3a02ef12c31ee21"
+    },
+    {
       "path": "_headers",
-      "bytes": 1750,
-      "sha256": "6ba69e2d72ae383a749b80b2d264d35ee277048bd22ae58526e71ada0926b836"
+      "bytes": 1836,
+      "sha256": "e191e1e863e1e8aceaeb2f0206c894baaec9414b8f043095f183cd683f9dd151"
+    },
+    {
+      "path": "assets/css/fonts.css",
+      "bytes": 1377,
+      "sha256": "f83dac4fa4c98f3fc1c4b0f372eef5b1452dff0e18c1210137260493964109d2"
     },
     {
       "path": "assets/css/styles.css",
-      "bytes": 43434,
-      "sha256": "0087fbbe7f65acb358af10364046aa3406d8b2bb50b8d4d293830238c5146a95"
+      "bytes": 44158,
+      "sha256": "9b9410533360cf1a419f93c8455e9e169d3a6378a7b2690f4f21f06bf4014110"
+    },
+    {
+      "path": "assets/fonts/fraunces-700-latin.woff2",
+      "bytes": 35512,
+      "sha256": "3f3e815263760b8a9c9d149a0cdfd69d05744a15829a6079fdb57480b50e4c51"
+    },
+    {
+      "path": "assets/fonts/fraunces-italic-latin.woff2",
+      "bytes": 81520,
+      "sha256": "066710ce7ed235a339d3d6cdcc8b55c0bea5632232662d83aacea25852108271"
+    },
+    {
+      "path": "assets/fonts/jetbrains-mono-latin.woff2",
+      "bytes": 31432,
+      "sha256": "83c005d49d8a6a50474c73a5a36ac0468076e9c4a29da7bdb14995d80560a5be"
+    },
+    {
+      "path": "assets/fonts/plus-jakarta-sans-latin.woff2",
+      "bytes": 27348,
+      "sha256": "153fc85b70298beeb1d61a5f723331649e7f23bb77302a66e61cb3e2fbdb5e79"
     },
     {
       "path": "assets/js/app.js",
-      "bytes": 66286,
-      "sha256": "8991f2500980a2367234567db50853b8735d037386e36cb0f3e3e8f43020875e"
+      "bytes": 67786,
+      "sha256": "ee76bb1e89dd7d25544454e748278f3e96f7c6b13dff6a75c70bdc3f4ad4b4a8"
     },
     {
       "path": "assets/js/config.js",
@@ -25,8 +60,8 @@
     },
     {
       "path": "assets/js/map.js",
-      "bytes": 9255,
-      "sha256": "45fe001da32250d4710ca5606f91b50857bbf2c6f26cd112fce0daa3bf026042"
+      "bytes": 9028,
+      "sha256": "0abd20c3514bfb911f4601859437cd2d6fbf3f9dc2abafcf9328fa04f7479f63"
     },
     {
       "path": "assets/js/sensory.js",
@@ -39,9 +74,24 @@
       "sha256": "06ed9e2cc0befb175fecd7f24caaa8beae48acc0ae548e412510569ba479c566"
     },
     {
+      "path": "assets/media/hero-poster.avif",
+      "bytes": 47037,
+      "sha256": "fa2a69c7adadad362d5b0ed925f6d741f36712c8f992da539e120d497b6f29c8"
+    },
+    {
       "path": "assets/media/hero-poster.jpg",
       "bytes": 50659,
       "sha256": "d0355f22ee3d76d1184f4363c464b387ea975386af0051e5e020b24e88d3bcfe"
+    },
+    {
+      "path": "assets/vendor/maplibre-gl/maplibre-gl.css",
+      "bytes": 70024,
+      "sha256": "ab1e70d59ec40465bae7e7030da2f3ccf28133fd502e62bd598eefbadfd7a732"
+    },
+    {
+      "path": "assets/vendor/maplibre-gl/maplibre-gl.js",
+      "bytes": 1054454,
+      "sha256": "e5b398823af45165124aef0b7e43ade5e1fc28d22807a5646da3ba38b8bfdc55"
     },
     {
       "path": "data/bootstrap.json",
@@ -50,13 +100,28 @@
     },
     {
       "path": "index.html",
-      "bytes": 10067,
-      "sha256": "0430adf5ec2a90d08b16ba64de72d658eb41e7f5aeda231da75be71bd47509ee"
+      "bytes": 12715,
+      "sha256": "c48dd4ee4c66dcad01bcf8501bfc8134ec16e03d6ab71665c08fc6711e7bb855"
+    },
+    {
+      "path": "legal/privacy.html",
+      "bytes": 2069,
+      "sha256": "19691cf050834095d6f011bc4e98fc89a1aa4634cd1a7c7fdef8167c9c9dc9fa"
+    },
+    {
+      "path": "legal/security-policy.html",
+      "bytes": 2004,
+      "sha256": "7039d9b79a014b506dd0a42031610085c0d44009185100ed3b82f4bbf3ad955a"
     },
     {
       "path": "robots.txt",
-      "bytes": 27,
-      "sha256": "32403248dc764535c87140955fc9451f9ebc9702f3e298d1c24fe84e558a53a9"
+      "bytes": 383,
+      "sha256": "2b846d3b005c40d1c70ff0f90614a2aa0a3004b0da8b0b15b40369bf81c316b0"
+    },
+    {
+      "path": "sitemap.xml",
+      "bytes": 525,
+      "sha256": "71ed235010dc60760bbe5c2ca607bd446969349feb821e235d296abfb689192c"
     }
   ]
 }

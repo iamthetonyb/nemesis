@@ -44,9 +44,14 @@ frontend/
   assets/js/map.js            MapLibre GL JS v5 wrapper
   assets/js/sensory.js        Optional Web Audio + Vibration API feedback
   assets/css/styles.css       All styles
+  assets/css/fonts.css        Self-hosted font declarations
+  assets/fonts/               Local WOFF2 fonts (no Google Fonts request)
   assets/media/               Hero video + poster assets
+  assets/vendor/              Local vendor assets (MapLibre GL)
   data/bootstrap.json         Pre-generated jurisdiction + GeoJSON data
   data/manifest.json          SHA-256 public artifact manifest
+  sitemap.xml                 Generated route sitemap
+  .well-known/security.txt    Coordinated disclosure contact
   _headers                    Cloudflare Pages security headers (CSP, HSTS, etc.)
 
 backend/                      Node.js + Express 5 + SQLite (optional, full dataset)
@@ -102,6 +107,7 @@ python3 -m http.server 8080
 ```bash
 pnpm generate:nevada   # regenerate frontend/data/bootstrap.json
 pnpm validate:data     # Rust validator — verifies source URLs, GeoJSON, key integrity
+pnpm sitemap           # regenerate frontend/sitemap.xml from the route table
 pnpm manifest          # regenerate frontend/data/manifest.json SHA-256 hashes
 pnpm check             # full gate: JS + Rust (fmt/clippy/test) + data + backend audit
 ```

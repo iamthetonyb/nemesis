@@ -3,29 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="USA Spending Watch — independent public dashboard surfacing federal, state, county, city, district, and authority spending from official sources.">
-<title>USA Spending Watch Demo</title>
+<meta name="description" content="USA Spending Watch maps FY 2026 federal, state, county, city, district, and authority spending with 42 source-linked records for public citizen review.">
+<title>USA Spending Watch | Public Budget Map</title>
+<link rel="canonical" href="https://gov-budget.pages.dev/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="USA Spending Watch">
+<meta property="og:title" content="USA Spending Watch | Public Budget Map">
+<meta property="og:description" content="FY 2026 public spending map for federal, state, county, city, district, and authority layers, with source-linked records.">
+<meta property="og:url" content="https://gov-budget.pages.dev/">
+<meta property="og:image" content="https://gov-budget.pages.dev/assets/media/hero-poster.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="672">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="USA Spending Watch | Public Budget Map">
+<meta name="twitter:description" content="FY 2026 public spending map for federal, state, county, city, district, and authority layers.">
+<meta name="twitter:image" content="https://gov-budget.pages.dev/assets/media/hero-poster.jpg">
 <link rel="icon" href="data:,"/>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://unpkg.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,500;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.css" crossorigin="anonymous" integrity="sha384-uTttxo/aOKbdE5RlD/SPzSDoDmNvGlUYPjONi2MN/b7c9HPSvW07OIuyP7uL6jxK"/>
+<link rel="preload" href="assets/fonts/plus-jakarta-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/fraunces-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/fonts.css?v=1">
+<link rel="stylesheet" href="assets/vendor/maplibre-gl/maplibre-gl.css?v=5.23.0">
 <script>(function(){try{var legacy=localStorage.getItem('usaSpendingWatch.sensory');var stored=localStorage.getItem('usaSpendingWatch.motion');var on=stored==='on'?true:stored==='off'?false:legacy==='on'?true:legacy==='off'?false:!matchMedia('(prefers-reduced-motion:reduce)').matches;document.documentElement.dataset.motion=on?'on':'off'}catch(e){document.documentElement.dataset.motion=matchMedia('(prefers-reduced-motion:reduce)').matches?'off':'on'}})()</script>
 <link rel="stylesheet" href="assets/css/styles.css?v=14"/>
 <script src="assets/js/config.js?v=1"></script>
-<script defer src="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.js" crossorigin="anonymous" integrity="sha384-XUm39RJVRRZhhm3KBfi4/fn/dxDBFEa1wA/yRSYhlb83K5ggl6ApLqbfwcJFlK/W"></script>
-<script defer src="assets/js/map.js?v=1"></script>
 <script defer src="assets/js/sensory.js?v=3"></script>
 <script defer src="assets/js/app.js?v=2"></script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://gov-budget.pages.dev/#org","name":"USA Spending Watch","url":"https://gov-budget.pages.dev/","sameAs":["https://github.com/iamthetonyb/USAspend"]},{"@type":"SoftwareApplication","@id":"https://gov-budget.pages.dev/#app","name":"USA Spending Watch","applicationCategory":"GovernmentApplication","operatingSystem":"Any modern browser","isAccessibleForFree":true,"url":"https://gov-budget.pages.dev/","softwareVersion":"0.1.0","creator":{"@id":"https://gov-budget.pages.dev/#org"}},{"@type":"FAQPage","@id":"https://gov-budget.pages.dev/#faq","mainEntity":[{"@type":"Question","name":"What does USA Spending Watch show?","acceptedAnswer":{"@type":"Answer","text":"It maps FY 2026 public spending by federal, state, county, city, district, and authority layers using source-linked public records."}},{"@type":"Question","name":"Are review tiers fraud allegations?","acceptedAnswer":{"@type":"Answer","text":"No. Review tiers are amount-volume signals used to prioritize public review; they are not allegations of fraud or waste."}}]},{"@type":"BreadcrumbList","@id":"https://gov-budget.pages.dev/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"USA Spending Watch","item":"https://gov-budget.pages.dev/"}]}]}</script>
 </head>
 <body>
-<noscript><style>body{display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#05050a;color:#d1cfc8}</style><p>USA Spending Watch requires JavaScript.</p></noscript>
+<a class="skip-link" href="#app">Skip to spending dashboard</a>
+<noscript><div class="no-js"><strong>USA Spending Watch works best with JavaScript.</strong><p>The core content is still readable: this FY 2026 demo maps federal, state, county, city, district, and authority spending records from official public sources.</p><picture><source srcset="assets/media/hero-poster.avif" type="image/avif"><img src="assets/media/hero-poster.jpg" width="1280" height="672" alt="Stylized Nevada public spending map preview" loading="lazy"></picture></div></noscript>
 <section class="hero" id="top">
   <video class="hero-bg-video" muted loop playsinline preload="none" poster="assets/media/hero-poster.jpg?v=1" data-src="assets/media/hero-motion.mp4?v=1" aria-hidden="true"></video>
   <div class="hero-inner">
     <div class="hero-kicker"><span class="hero-dot"></span>FY 2026 &middot; Live Citizen Audit</div>
-    <h1>Where your<br>
+    <h1><span class="sr-only">USA Spending Watch: </span>Where your<br>
       <span class="money-wrap">
         <span class="sp s1">&#10022;</span><span class="sp s2">&#10022;</span><span class="sp s3">&#10022;</span><span class="money">tax <span class="money-dollars">$$</span></span>
       </span> <em>actually</em> go.
@@ -51,7 +64,7 @@
 </section>
 <div class="app-section" id="app">
 <div class="hdr">
-<div class="hdr-l"><div class="logo">USA</div><div class="hdr-t"><h1>USA Spending Watch</h1><span>County-first source review &middot; federal, state, county, city, district, authority layers</span></div></div>
+<div class="hdr-l"><div class="logo">USA</div><div class="hdr-t"><div class="app-title">USA Spending Watch</div><span>County-first source review &middot; federal, state, county, city, district, authority layers</span></div></div>
 <div class="hdr-r"><div class="ll"><span class="ldot"></span> DEMO</div><div class="yr">FY 2026</div><button class="mobile-kpi-btn" onclick="dashboardActions.toggleKpis()">KPI</button></div>
 </div>
 <div class="kpi-backdrop" id="kpiBackdrop" onclick="dashboardActions.closeKpis()"></div>
@@ -100,7 +113,7 @@
 <div class="hiw-section">
 <div class="hiw-icon">&#128269;</div>
 <h3>What is this?</h3>
-<p>An open-source tool that surfaces government spending data by county, agency, and source type. Every figure links to an official record &mdash; USAspending.gov, state checkbooks, county portals.</p>
+<p>An open-source tool that surfaces government spending data by county, agency, and source type. Every figure links to an official record, including <a href="https://www.usaspending.gov/" rel="external noopener noreferrer">USAspending.gov</a>, state checkbooks, and county portals.</p>
 </div>
 <div class="hiw-section">
 <div class="hiw-icon">&#128506;</div>
@@ -121,11 +134,11 @@
 <div class="hiw-icon">&#128196;</div>
 <h3>Data sources</h3>
 <ul>
-<li><strong>Federal:</strong> USAspending.gov FY 2026 awards &amp; obligations</li>
+<li><strong>Federal:</strong> <a href="https://www.usaspending.gov/" rel="external noopener noreferrer">USAspending.gov</a> FY 2026 awards &amp; obligations</li>
 <li><strong>Nevada State:</strong> OpenGov state checkbook (~$960M)</li>
 <li><strong>Clark County School District:</strong> OpenGov portal</li>
 <li><strong>Counties:</strong> Nevada county ACFR financial reports</li>
-<li><strong>Geography:</strong> TIGERweb Census boundaries</li>
+<li><strong>Geography:</strong> <a href="https://tigerweb.geo.census.gov/" rel="external noopener noreferrer">TIGERweb Census boundaries</a></li>
 </ul>
 </div>
 <div class="hiw-section">

@@ -63,6 +63,9 @@ jobs:
       - name: Install backend deps (for any shared utilities)
         run: pnpm --dir backend install --frozen-lockfile
 
+      - name: Audit backend prod deps
+        run: pnpm --dir backend audit --prod --audit-level high
+
       # --- Step 1: Regenerate federal baseline from USAspending + TIGERweb ---
       # This always runs first — creates the authoritative base bootstrap.json.
       # Ingest steps below then augment it with additional state/local sources.
@@ -115,6 +118,9 @@ jobs:
       - name: Validate bootstrap.json (Rust gate)
         run: pnpm validate:data
 
+      - name: Generate sitemap
+        run: pnpm sitemap
+
       - name: Generate public artifact manifest
         run: pnpm manifest
 
@@ -126,14 +132,14 @@ jobs:
       - name: Check for changes
         id: diff
         run: |
-          git diff --quiet frontend/data/bootstrap.json frontend/data/manifest.json && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+          git diff --quiet frontend/data/bootstrap.json frontend/data/manifest.json frontend/sitemap.xml && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: Commit updated data
         if: ${{ steps.diff.outputs.changed == 'true' && github.event.inputs.dry_run != 'true' }}
         run: |
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git add frontend/data/bootstrap.json frontend/data/manifest.json
+          git add frontend/data/bootstrap.json frontend/data/manifest.json frontend/sitemap.xml
           DATE=$(date -u +%Y-%m-%d)
           git commit -m "data: Nevada refresh ${DATE} [skip ci]"
           git push

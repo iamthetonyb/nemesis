@@ -8,7 +8,7 @@ Use Cloudflare Pages as the public surface. Do not expose a VPS, MacBook, databa
 
 - Protect the entire Pages site with Cloudflare Access.
 - Allow only your email, trusted collaborators, or a small org group.
-- Keep `frontend/robots.txt` and `X-Robots-Tag` as noindex.
+- If the project goes private again, restore `X-Robots-Tag: noindex` and a locked-down `frontend/robots.txt`.
 
 ### Public demo with anti-bot gate
 
@@ -58,10 +58,10 @@ Do not implement a fake static JavaScript CAPTCHA. Turnstile tokens must be veri
 - `X-Content-Type-Options`
 - `Referrer-Policy`
 - `Permissions-Policy`
-- `X-Robots-Tag`
+- `X-DNS-Prefetch-Control`
 - cross-origin isolation guardrails
 
-Current CSP permits `unpkg.com` and Google Fonts because the inherited static frontend still loads MapLibre and fonts from CDNs. It also temporarily permits `unsafe-inline` scripts because the inherited UI still uses inline event handlers in generated HTML. For a stricter release, move UI actions to delegated event listeners, vendor external assets locally, and remove external script/style/font domains plus `unsafe-inline`.
+MapLibre and fonts are vendored locally so the initial shell does not depend on Google Fonts or unpkg. CSP still temporarily permits `unsafe-inline` scripts because the inherited UI still uses inline event handlers in generated HTML. For a stricter release, move UI actions to delegated event listeners and remove `unsafe-inline`.
 
 Current CSP also permits `tile.openstreetmap.org` for the public demo basemap. Keep this for low-volume testing only. Before broader launch, switch to a paid/free-tier tile provider with production terms, self-host PMTiles, or use Cloudflare/R2-hosted vector tiles so the app does not depend on best-effort public OSM tiles.
 

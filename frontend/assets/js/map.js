@@ -87,20 +87,13 @@ window.AuditMap = (() => {
           return;
         }
 
-        const element = document.createElement("button");
-        element.type = "button";
+        const element = document.createElement("div");
         element.className = `map-label map-label-${feature.properties.labelKind || "area"}`;
         element.textContent = feature.properties.labelText;
+        element.setAttribute("aria-hidden", "true");
         element.style.zIndex = String(feature.properties.labelZIndex || feature.properties.labelPriority || 0);
         element.dataset.areaKey = getFeatureAreaKey(feature.properties) || "";
         element.dataset.labelKind = feature.properties.labelKind || "area";
-        element.addEventListener("click", (event) => {
-          event.stopPropagation();
-          const areaKey = getFeatureAreaKey(feature.properties);
-          if (_onAreaClick) {
-            _onAreaClick(areaKey);
-          }
-        });
 
         const marker = new maplibregl.Marker({
           element,

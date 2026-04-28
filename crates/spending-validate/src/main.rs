@@ -303,12 +303,18 @@ fn collect_public_files(
 
 fn is_manifest_public_file(path: &str) -> bool {
     path == "index.html"
+        || path == "404.html"
         || path == "robots.txt"
+        || path == "sitemap.xml"
         || path == "_headers"
+        || path.starts_with(".well-known/")
+        || path.starts_with("legal/")
         || path.starts_with("data/")
         || path.starts_with("assets/css/")
+        || path.starts_with("assets/fonts/")
         || path.starts_with("assets/js/")
         || path.starts_with("assets/media/")
+        || path.starts_with("assets/vendor/")
 }
 
 fn is_safe_manifest_path(path: &str) -> bool {

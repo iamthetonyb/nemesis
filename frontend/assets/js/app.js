@@ -3,11 +3,8 @@
   const STATIC_DATA_BASE_URL = window.DASHBOARD_STATIC_DATA_BASE_URL
     ? String(window.DASHBOARD_STATIC_DATA_BASE_URL).replace(/\/$/, "")
     : "";
-
-  if (!window.maplibregl || !window.AuditMap) {
-    console.error("MapLibre GL or AuditMap failed to load.");
-    return;
-  }
+  const MAPLIBRE_SRC = "assets/vendor/maplibre-gl/maplibre-gl.js?v=5.23.0";
+  const AUDIT_MAP_SRC = "assets/js/map.js?v=1";
 
   const state = {
     mapFilter: "all",
@@ -75,6 +72,7 @@
   let regionsByKey = new Map();
   let provincesByKey = new Map();
   let turnstileLoadPromise = null;
+  let mapLoadPromise = null;
 
   function escapeHtml(value) {
     return String(value)
@@ -117,6 +115,43 @@
 
   function actionExpr(expression) {
     return escapeAttr(expression);
+  }
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector(`script[src="${src}"]`);
+      if (existing) {
+        if (existing.dataset.loaded === "true") {
+          resolve();
+          return;
+        }
+        existing.addEventListener("load", resolve, { once: true });
+        existing.addEventListener("error", () => reject(new Error(`Failed to load ${src}`)), { once: true });
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = src;
+      script.async = true;
+      script.onload = () => {
+        script.dataset.loaded = "true";
+        resolve();
+      };
+      script.onerror = () => reject(new Error(`Failed to load ${src}`));
+      document.head.appendChild(script);
+    });
+  }
+
+  function ensureMapEngine() {
+    if (window.maplibregl && window.AuditMap) {
+      return Promise.resolve();
+    }
+
+    if (!mapLoadPromise) {
+      mapLoadPromise = loadScript(MAPLIBRE_SRC).then(() => loadScript(AUDIT_MAP_SRC));
+    }
+
+    return mapLoadPromise;
   }
 
   function normalizeSourceId(sourceId) {
@@ -901,6 +936,12 @@
   }
 
   function renderGeoLayer(fitToBounds) {
+    if (!window.AuditMap) {
+      setMapStatus("Loading map engine...", false);
+      initMap();
+      return;
+    }
+
     const geo = getActiveGeo();
 
     if (!geo || !Array.isArray(geo.features) || !geo.features.length) {
@@ -922,12 +963,22 @@
     );
   }
 
-  function initMap() {
-    renderGeoLayer(true);
+  async function initMap() {
+    try {
+      await ensureMapEngine();
+      renderGeoLayer(true);
+    } catch (error) {
+      console.error("Map engine failed to load:", error);
+      setMapStatus("Map engine unavailable.", true);
+    }
   }
 
   function refreshMapStyles() {
-    AuditMap.refresh(getActiveGeo(), featureStyle);
+    if (!window.AuditMap) {
+      initMap();
+      return;
+    }
+    window.AuditMap.refresh(getActiveGeo(), featureStyle);
   }
 
   function renderPackageTableRows(items) {
@@ -1394,7 +1445,7 @@
   }
 
   function openAreaModal(areaKey) {
-    AuditMap.closePopup();
+    window.AuditMap?.closePopup();
     state.selectedAreaKey = areaKey;
     state.selectedOwnerKey = null;
     state.modal = {
@@ -1417,7 +1468,7 @@
   }
 
   function openOwnerModal(ownerName, ownerType) {
-    AuditMap.closePopup();
+    window.AuditMap?.closePopup();
     state.selectedAreaKey = null;
     state.selectedOwnerKey = getOwnerCardKey(ownerType, ownerName);
     state.modal = {
@@ -1729,7 +1780,7 @@
     const appSection = document.getElementById("app");
     if (!appSection || !window.IntersectionObserver) return;
     const io = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) AuditMap.resize();
+      if (entries[0].isIntersecting) window.AuditMap?.resize();
     }, { threshold: 0.1 });
     io.observe(appSection);
   }

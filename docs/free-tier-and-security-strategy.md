@@ -67,7 +67,7 @@ Phase 0:
 - No Worker.
 - No D1.
 - Static `frontend/data/bootstrap.json`.
-- Cloudflare Pages headers and noindex robots defaults.
+- Cloudflare Pages headers, crawler controls, sitemap, and public artifact manifest.
 - Optional WAF Managed Challenge before `/` and `/data/*`.
 
 Phase 1:

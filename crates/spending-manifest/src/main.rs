@@ -137,12 +137,18 @@ fn is_public_file(root: &Path, path: &Path) -> bool {
     };
     let path = normalize_path(relative);
     path == "index.html"
+        || path == "404.html"
         || path == "robots.txt"
+        || path == "sitemap.xml"
         || path == "_headers"
+        || path.starts_with(".well-known/")
+        || path.starts_with("legal/")
         || path.starts_with("data/")
         || path.starts_with("assets/css/")
+        || path.starts_with("assets/fonts/")
         || path.starts_with("assets/js/")
         || path.starts_with("assets/media/")
+        || path.starts_with("assets/vendor/")
 }
 
 fn entry_for(root: &Path, path: &Path) -> Result<Entry, String> {
