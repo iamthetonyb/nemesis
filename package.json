@@ -8,7 +8,7 @@
     "pnpm": ">=10.0.0"
   },
   "scripts": {
-    "deploy:pages": "pnpm dlx wrangler@4.84.1 pages deploy frontend --project-name gov-budget --branch main",
+    "deploy:pages": "pnpm dlx wrangler@4.86.0 pages deploy frontend --project-name gov-budget --branch main",
     "generate:nevada": "node tools/generate-nevada-demo.mjs > frontend/data/bootstrap.json",
     "ingest:nevada": "pnpm generate:nevada && node tools/ingest/nevada-state-checkbook.mjs",
     "check:frontend": "node --check frontend/assets/js/app.js && node --check frontend/assets/js/map.js && node --check frontend/assets/js/sensory.js && node --check tools/generate-nevada-demo.mjs && node --check tools/generate-sitemap.mjs && node --check tools/ingest/nevada-state-checkbook.mjs && node --check tools/ingest/nevada-las-vegas.mjs && node --check tools/ingest/nevada-ccsd.mjs && node --check tools/ingest/nevada-counties.mjs && node --check tools/ingest/nevada-districts.mjs",
