@@ -17,6 +17,8 @@
     '.pi',
     '.map-label',
     '.legend-btn',
+    '.settings-toggle',
+    '.setting-row',
     '.feedback-submit',
     '.modal-close',
     '.pager-btn',
@@ -169,7 +171,7 @@
   function kindFor(element) {
     if (!element) return 'tap';
     if (element.closest('.btn-map')) return 'map';
-    if (element.closest('.btn-sec,.scroll-cue,.legend-btn,.fc,.stb,.pager-btn')) return 'nav';
+    if (element.closest('.btn-sec,.scroll-cue,.legend-btn,.settings-toggle,.fc,.stb,.pager-btn')) return 'nav';
     if (element.closest('.feedback-submit')) return 'success';
     if (element.closest('.modal-close,[aria-label*="Close"]')) return 'close';
     return 'tap';
@@ -184,15 +186,23 @@
     document.documentElement.dataset.motion = motionEnabled ? 'on' : 'off';
     syncHeroVideo();
     if (!button) return;
-    button.textContent = motionEnabled ? 'FX on' : 'FX off';
+    const state = button.querySelector('.setting-state');
+    if (state) {
+      state.textContent = motionEnabled ? 'On' : 'Off';
+    }
     button.dataset.enabled = String(motionEnabled);
     button.setAttribute('aria-pressed', String(motionEnabled));
+    button.setAttribute('aria-label', motionEnabled ? 'Visual effects on' : 'Visual effects off');
     button.title = motionEnabled ? 'Visual effects on' : 'Visual effects off';
   }
 
   function updateSoundToggle() {
     const button = document.getElementById('soundToggle');
     if (!button) return;
+    const state = button.querySelector('.setting-state');
+    if (state) {
+      state.textContent = feedbackEnabled ? 'On' : 'Off';
+    }
     button.dataset.enabled = String(feedbackEnabled);
     button.setAttribute('aria-pressed', String(feedbackEnabled));
     button.setAttribute('aria-label', feedbackEnabled ? 'Sound and haptic feedback on' : 'Sound and haptic feedback off');
@@ -278,9 +288,32 @@
   }
 
   function bind() {
+    const settingsToggle = document.getElementById('settingsToggle');
+    const settingsPanel = document.getElementById('settingsPanel');
     const motionToggle = document.getElementById('sensoryToggle');
     const soundToggle = document.getElementById('soundToggle');
 
+    function closeSettings() {
+      if (!settingsToggle || !settingsPanel) return;
+      settingsToggle.setAttribute('aria-expanded', 'false');
+      settingsToggle.setAttribute('aria-label', 'Open experience settings');
+      settingsPanel.classList.remove('open');
+      settingsPanel.setAttribute('aria-hidden', 'true');
+    }
+
+    function toggleSettings() {
+      if (!settingsToggle || !settingsPanel) return;
+      const open = settingsToggle.getAttribute('aria-expanded') === 'true';
+      settingsToggle.setAttribute('aria-expanded', String(!open));
+      settingsToggle.setAttribute('aria-label', open ? 'Open experience settings' : 'Close experience settings');
+      settingsPanel.classList.toggle('open', !open);
+      settingsPanel.setAttribute('aria-hidden', String(open));
+      pulse('nav');
+    }
+
+    if (settingsToggle) {
+      settingsToggle.addEventListener('click', toggleSettings);
+    }
     if (motionToggle) {
       motionToggle.addEventListener('click', () => setMotionEnabled(!motionEnabled));
     }
@@ -294,7 +327,7 @@
     document.addEventListener('pointerdown', (event) => {
       if (event.button !== undefined && event.button !== 0) return;
       const target = closestFrom(event.target, interactiveSelector);
-      if (!target || target.id === 'sensoryToggle' || target.id === 'soundToggle' || isDisabled(target)) return;
+      if (!target || target.id === 'settingsToggle' || target.id === 'sensoryToggle' || target.id === 'soundToggle' || isDisabled(target)) return;
       const now = performance.now();
       if (now - lastTapAt < 42) return;
       lastTapAt = now;
@@ -303,7 +336,7 @@
 
     document.addEventListener('pointerenter', (event) => {
       if (!finePointerQuery || !finePointerQuery.matches || !feedbackEnabled) return;
-      const target = closestFrom(event.target, '.btn-map,.btn-sec,.feedback-btn,.sensory-toggle,.sound-toggle,.fc,.stb,.pi,.map-label');
+      const target = closestFrom(event.target, '.btn-map,.btn-sec,.feedback-btn,.settings-toggle,.setting-row,.fc,.stb,.pi,.map-label');
       if (!target || isDisabled(target)) return;
       const now = performance.now();
       if (now - lastHoverAt < 180) return;
@@ -317,6 +350,13 @@
       if (!target || isTypingTarget(target) || isDisabled(target)) return;
       pulse(kindFor(target));
     });
+
+    document.addEventListener('pointerdown', (event) => {
+      if (!settingsPanel || !settingsToggle || settingsToggle.getAttribute('aria-expanded') !== 'true') return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (target && (settingsPanel.contains(target) || settingsToggle.contains(target))) return;
+      closeSettings();
+    }, { passive: true });
   }
 
   if (document.readyState === 'loading') {

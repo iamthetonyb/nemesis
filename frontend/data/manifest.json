@@ -25,8 +25,8 @@
     },
     {
       "path": "assets/css/styles.css",
-      "bytes": 44158,
-      "sha256": "9b9410533360cf1a419f93c8455e9e169d3a6378a7b2690f4f21f06bf4014110"
+      "bytes": 44803,
+      "sha256": "89d78557f435d16ecb9d59a8688cc2ad06014f28ade23be0e1aaf1f9e2fc1f35"
     },
     {
       "path": "assets/fonts/fraunces-700-latin.woff2",
@@ -51,7 +51,7 @@
     {
       "path": "assets/js/app.js",
       "bytes": 67786,
-      "sha256": "ee76bb1e89dd7d25544454e748278f3e96f7c6b13dff6a75c70bdc3f4ad4b4a8"
+      "sha256": "8f827059c770e4dbab38625b2f93e72264f40b1e0f7afab50a55dd5d98ca8b28"
     },
     {
       "path": "assets/js/config.js",
@@ -65,8 +65,8 @@
     },
     {
       "path": "assets/js/sensory.js",
-      "bytes": 10846,
-      "sha256": "0cf567f256f4366c9948c025e1fb8eef7cbbb89dd89336a56e34d9e626f17b1a"
+      "bytes": 12700,
+      "sha256": "aebbb1438f49711bc1d6c0c1ee41bb2fc38fcb27b97a18769a808587519e2962"
     },
     {
       "path": "assets/media/hero-motion.mp4",
@@ -100,8 +100,8 @@
     },
     {
       "path": "index.html",
-      "bytes": 12715,
-      "sha256": "c48dd4ee4c66dcad01bcf8501bfc8134ec16e03d6ab71665c08fc6711e7bb855"
+      "bytes": 13133,
+      "sha256": "6dd2bcf950f09c3b1a17c9b8df2e9df810156b99b3093e8ac4db1c8475984287"
     },
     {
       "path": "legal/privacy.html",

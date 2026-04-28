@@ -25,10 +25,10 @@
 <link rel="stylesheet" href="assets/css/fonts.css?v=1">
 <link rel="stylesheet" href="assets/vendor/maplibre-gl/maplibre-gl.css?v=5.23.0">
 <script>(function(){try{var legacy=localStorage.getItem('usaSpendingWatch.sensory');var stored=localStorage.getItem('usaSpendingWatch.motion');var on=stored==='on'?true:stored==='off'?false:legacy==='on'?true:legacy==='off'?false:!matchMedia('(prefers-reduced-motion:reduce)').matches;document.documentElement.dataset.motion=on?'on':'off'}catch(e){document.documentElement.dataset.motion=matchMedia('(prefers-reduced-motion:reduce)').matches?'off':'on'}})()</script>
-<link rel="stylesheet" href="assets/css/styles.css?v=14"/>
+<link rel="stylesheet" href="assets/css/styles.css?v=15"/>
 <script src="assets/js/config.js?v=1"></script>
-<script defer src="assets/js/sensory.js?v=3"></script>
-<script defer src="assets/js/app.js?v=2"></script>
+<script defer src="assets/js/sensory.js?v=4"></script>
+<script defer src="assets/js/app.js?v=3"></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://gov-budget.pages.dev/#org","name":"USA Spending Watch","url":"https://gov-budget.pages.dev/","sameAs":["https://github.com/iamthetonyb/USAspend"]},{"@type":"SoftwareApplication","@id":"https://gov-budget.pages.dev/#app","name":"USA Spending Watch","applicationCategory":"GovernmentApplication","operatingSystem":"Any modern browser","isAccessibleForFree":true,"url":"https://gov-budget.pages.dev/","softwareVersion":"0.1.0","creator":{"@id":"https://gov-budget.pages.dev/#org"}},{"@type":"FAQPage","@id":"https://gov-budget.pages.dev/#faq","mainEntity":[{"@type":"Question","name":"What does USA Spending Watch show?","acceptedAnswer":{"@type":"Answer","text":"It maps FY 2026 public spending by federal, state, county, city, district, and authority layers using source-linked public records."}},{"@type":"Question","name":"Are review tiers fraud allegations?","acceptedAnswer":{"@type":"Answer","text":"No. Review tiers are amount-volume signals used to prioritize public review; they are not allegations of fraud or waste."}}]},{"@type":"BreadcrumbList","@id":"https://gov-budget.pages.dev/#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"USA Spending Watch","item":"https://gov-budget.pages.dev/"}]}]}</script>
 </head>
 <body>
@@ -85,12 +85,16 @@
 </div>
 </div>
 </div>
-<div class="effect-controls" aria-label="Experience controls">
-<button class="sensory-toggle" id="sensoryToggle" type="button" aria-pressed="true" aria-label="Toggle visual effects">FX on</button>
-<button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true" aria-label="Toggle sound and haptic feedback">
-<svg class="sound-on-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8c1.3 1.1 1.9 2.4 1.9 4s-.6 2.9-1.9 4"/><path d="M18.5 5.5c2.1 1.8 3.2 4 3.2 6.5s-1.1 4.7-3.2 6.5"/></svg>
-<svg class="sound-off-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="m18 9 4 4m0-4-4 4"/></svg>
+<div class="settings-controls" aria-label="Experience settings">
+<button class="settings-toggle" id="settingsToggle" type="button" aria-expanded="false" aria-controls="settingsPanel" aria-label="Open experience settings">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.4a3.6 3.6 0 1 0 0 7.2 3.6 3.6 0 0 0 0-7.2Z"/><path d="M19.4 13.5c.1-.5.1-1 .1-1.5s0-1-.1-1.5l2-1.5-2-3.4-2.4 1a8.1 8.1 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.6A8.1 8.1 0 0 0 7 6.6l-2.4-1-2 3.4 2 1.5c-.1.5-.1 1-.1 1.5s0 1 .1 1.5l-2 1.5 2 3.4 2.4-1a8.1 8.1 0 0 0 2.6 1.5L10 21.5h4l.4-2.6a8.1 8.1 0 0 0 2.6-1.5l2.4 1 2-3.4-2-1.5Z"/></svg>
 </button>
+<div class="settings-panel" id="settingsPanel" aria-hidden="true">
+<button class="setting-row sensory-toggle" id="sensoryToggle" type="button" aria-pressed="true" aria-label="Visual effects on"><span>Visual FX</span><strong class="setting-state">On</strong></button>
+<button class="setting-row sound-toggle" id="soundToggle" type="button" aria-pressed="true" aria-label="Sound and haptic feedback on">
+<span>Sound + haptics</span><strong class="setting-state">On</strong>
+</button>
+</div>
 </div>
 <button class="feedback-btn" id="feedbackButton" onclick="dashboardActions.openFeedback()">Feedback</button>
 <div class="feedback-panel" id="feedbackPanel" aria-hidden="true">

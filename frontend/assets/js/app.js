@@ -4,7 +4,7 @@
     ? String(window.DASHBOARD_STATIC_DATA_BASE_URL).replace(/\/$/, "")
     : "";
   const MAPLIBRE_SRC = "assets/vendor/maplibre-gl/maplibre-gl.js?v=5.23.0";
-  const AUDIT_MAP_SRC = "assets/js/map.js?v=1";
+  const AUDIT_MAP_SRC = "assets/js/map.js?v=2";
 
   const state = {
     mapFilter: "all",

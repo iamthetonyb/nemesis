@@ -21,7 +21,11 @@ test("desktop dashboard core UI works", async ({ page }) => {
       .filter((url) => /fonts\.googleapis|fonts\.gstatic|unpkg/.test(url))
   );
   expect(externalAssets).toEqual([]);
-  await expect(page.locator(".sensory-toggle")).toHaveText("FX on");
+  await expect(page.locator('script[src*="assets/js/app.js"]')).toHaveAttribute("src", /v=3/);
+  await expect(page.locator(".settings-toggle")).toBeVisible();
+  await page.locator(".settings-toggle").click();
+  await expect(page.locator("#settingsPanel")).toHaveClass(/open/);
+  await expect(page.locator(".sensory-toggle .setting-state")).toHaveText("On");
   await expect(page.locator(".sound-toggle")).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".hero-bg-video")).toHaveAttribute("poster", /hero-poster\.jpg/);
   await expect.poll(() => page.locator(".hero-bg-video").evaluate((node) => node.getAttribute("src") || "")).toContain("hero-motion.mp4");
@@ -70,7 +74,7 @@ test("desktop dashboard core UI works", async ({ page }) => {
   expect(afterMotion).toBe("running");
 
   await page.locator(".sensory-toggle").click();
-  await expect(page.locator(".sensory-toggle")).toHaveText("FX off");
+  await expect(page.locator(".sensory-toggle .setting-state")).toHaveText("Off");
   await expect(page.locator(".sensory-toggle")).toHaveAttribute("aria-pressed", "false");
   const offMotion = await page.evaluate(() => ({
     sparkle: getComputedStyle(document.querySelector(".sp")).animationName,
@@ -81,11 +85,13 @@ test("desktop dashboard core UI works", async ({ page }) => {
   }));
   expect(offMotion).toEqual({ sparkle: "none", scrollCue: "none", mapButton: "none", heroOverlay: "none", videoSrc: "" });
   await page.locator(".sensory-toggle").click();
-  await expect(page.locator(".sensory-toggle")).toHaveText("FX on");
+  await expect(page.locator(".sensory-toggle .setting-state")).toHaveText("On");
 
   await page.locator(".sound-toggle").click();
+  await expect(page.locator(".sound-toggle .setting-state")).toHaveText("Off");
   await expect(page.locator(".sound-toggle")).toHaveAttribute("aria-pressed", "false");
   await page.locator(".sound-toggle").click();
+  await expect(page.locator(".sound-toggle .setting-state")).toHaveText("On");
   await expect(page.locator(".sound-toggle")).toHaveAttribute("aria-pressed", "true");
   await expect(page.evaluate(() => window.Sensory && window.Sensory.isFeedbackEnabled())).resolves.toBe(true);
 
@@ -121,8 +127,8 @@ test("mobile HUD controls do not overlap", async ({ page }) => {
   await page.waitForFunction(() => window.dashboardActions && document.querySelector(".maplibregl-ctrl-top-left"));
 
   await expect(page.locator(".hdr-t .app-title")).toHaveText("USA Spending Watch");
-  await expect(page.locator(".sensory-toggle")).toBeVisible();
-  await expect(page.locator(".sound-toggle")).toBeVisible();
+  await expect(page.locator(".settings-toggle")).toBeVisible();
+  await expect(page.locator("#settingsPanel")).not.toHaveClass(/open/);
   await expect(page.locator('input[placeholder="Search jurisdiction..."]')).toBeVisible();
 
   const layout = await page.evaluate(() => {
@@ -144,8 +150,9 @@ test("mobile HUD controls do not overlap", async ({ page }) => {
       controls: rect(".maplibregl-ctrl-top-left"),
       kpiButton: rect(".mobile-kpi-btn"),
       sidebar: rect("#sidebar"),
-      effectControls: rect(".effect-controls"),
+      settingsControls: rect(".settings-controls"),
       feedback: rect("#feedbackButton"),
+      legend: rect("#legend-container"),
       cta: rect(".btn-map"),
       heroVideo: rect(".hero-bg-video"),
       map: rect("#map"),
@@ -159,7 +166,8 @@ test("mobile HUD controls do not overlap", async ({ page }) => {
   expect(layout.controls.left).toBeGreaterThanOrEqual(0);
   expect(layout.controls.right).toBeLessThanOrEqual(layout.bodyWidth);
   expect(layout.kpiButton.right).toBeLessThanOrEqual(layout.bodyWidth);
-  expect(layout.effectControls.right).toBeLessThan(layout.feedback.left);
+  expect(layout.settingsControls.left).toBeGreaterThan(layout.legend.right);
+  expect(layout.settingsControls.bottom).toBeLessThanOrEqual(layout.feedback.top);
   expect(layout.cta.width).toBeGreaterThan(330);
   expect(layout.cta.height).toBeGreaterThanOrEqual(88);
   expect(layout.heroVideo.width).toBeGreaterThan(300);
@@ -168,6 +176,11 @@ test("mobile HUD controls do not overlap", async ({ page }) => {
   await expect(page.locator("#kpi")).toHaveClass(/open/);
   await page.mouse.click(10, 830);
   await expect(page.locator("#kpi")).not.toHaveClass(/open/);
+
+  await page.locator(".settings-toggle").click();
+  await expect(page.locator("#settingsPanel")).toHaveClass(/open/);
+  await expect(page.locator(".sensory-toggle")).toBeVisible();
+  await expect(page.locator(".sound-toggle")).toBeVisible();
 
   await page.locator("#feedbackButton").click();
   await expect(page.locator("#feedbackPanel")).toHaveClass(/open/);
