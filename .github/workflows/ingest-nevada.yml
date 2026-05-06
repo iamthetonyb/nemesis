@@ -23,6 +23,9 @@ on:
 permissions:
   contents: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 concurrency:
   group: ingest-nevada
   cancel-in-progress: false
@@ -62,8 +65,6 @@ jobs:
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: "10"
 
       - name: Install backend deps (for any shared utilities)
         run: pnpm --dir backend install --frozen-lockfile
@@ -131,35 +132,25 @@ jobs:
       - name: Ingest — Nevada state checkbook
         if: ${{ env.REFRESH_SOURCES != 'discovery' && (env.REFRESH_SOURCES == 'all' || contains(env.REFRESH_SOURCES, 'state')) }}
         run: node tools/ingest/nevada-state-checkbook.mjs
-        env:
-          INGEST_DRY_RUN: ${{ env.DRY_RUN }}
 
       - name: Ingest — Las Vegas city checkbook
         if: ${{ env.REFRESH_SOURCES != 'discovery' && (env.REFRESH_SOURCES == 'all' || contains(env.REFRESH_SOURCES, 'las-vegas')) }}
         run: node tools/ingest/nevada-las-vegas.mjs
-        env:
-          INGEST_DRY_RUN: ${{ env.DRY_RUN }}
         continue-on-error: true
 
       - name: Ingest — Clark County School District
         if: ${{ env.REFRESH_SOURCES != 'discovery' && (env.REFRESH_SOURCES == 'all' || contains(env.REFRESH_SOURCES, 'ccsd')) }}
         run: node tools/ingest/nevada-ccsd.mjs
-        env:
-          INGEST_DRY_RUN: ${{ env.DRY_RUN }}
         continue-on-error: true
 
       - name: Ingest — County ACFR/portal data
         if: ${{ env.REFRESH_SOURCES != 'discovery' && (env.REFRESH_SOURCES == 'all' || contains(env.REFRESH_SOURCES, 'counties')) }}
         run: node tools/ingest/nevada-counties.mjs
-        env:
-          INGEST_DRY_RUN: ${{ env.DRY_RUN }}
         continue-on-error: true
 
       - name: Ingest — Special districts
         if: ${{ env.REFRESH_SOURCES != 'discovery' && (env.REFRESH_SOURCES == 'all' || contains(env.REFRESH_SOURCES, 'districts')) }}
         run: node tools/ingest/nevada-districts.mjs
-        env:
-          INGEST_DRY_RUN: ${{ env.DRY_RUN }}
         continue-on-error: true
 
       - name: Discover source portals
